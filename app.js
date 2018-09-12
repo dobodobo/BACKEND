@@ -15,7 +15,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
     res.r = (result) => {
         res.json({
-            status: true,
+            status: 200,
             message: "success",
             result,
         });
