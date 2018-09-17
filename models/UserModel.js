@@ -11,7 +11,7 @@ exports.checkEmail = (email) => {
     const sql =
       `
       SELECT idx, email
-      FROM Users
+      FROM user
       WHERE email = ?;
       `;
 
@@ -57,7 +57,7 @@ exports.getUserByIdx = (idx) => {
     const sql =
       `
       SELECT idx, email, nick, avatar, salt
-      FROM Users
+      FROM user
       WHERE idx = ?;
       `;
 
@@ -80,7 +80,7 @@ exports.signup = (user) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
-      INSERT INTO Users(email, pwd, nick, avatar, salt)
+      INSERT INTO user(email, pwd, nick, avatar, salt)
       VALUES (?, ?, ?, ?, ?);
       `;
 
@@ -99,7 +99,7 @@ exports.getSalt = (email) => {
     const sql =
       `
       SELECT salt
-      FROM Users
+      FROM user
       WHERE email = ?;
       `;
 
@@ -122,7 +122,7 @@ exports.signin = (user) => {
     const sql =
       `
       SELECT idx, email, nick, avatar
-      FROM Users
+      FROM user
       WHERE email = ? AND pwd = ?;
       ;
       `;
