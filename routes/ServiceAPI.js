@@ -4,10 +4,10 @@ const userCtrl = require('../controllers/UserCtrl');
 
 module.exports = (router) => {
 
-  router.route('/signup')
+  router.route('/users/signup')
     .post(userCtrl.signup);
 
-  router.route('/signin')
+  router.route('/users/signin')
     .post(userCtrl.signin);
 
 
