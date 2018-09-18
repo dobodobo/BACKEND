@@ -67,7 +67,7 @@ exports.editUser = async (req, res, next) => {
     const secretData = config.doCipher(req.body.pwd);
 
     const reqData = {
-      idx : req.body.userIdx,
+      idx: req.userIdx,
       pwd : secretData.pw,
       salt : secretData._salt,
       nick : req.body.nick
@@ -91,7 +91,7 @@ exports.editAvatar = async (req, res, next) => {
   try {
 
     const reqData = {
-      idx : req.body.userIdx,
+      idx: req.userIdx,
       avatar: req.file 
     };
 
@@ -109,10 +109,9 @@ exports.editAvatar = async (req, res, next) => {
 */
 exports.reqSeoulight = async (req, res, next) => {
 
-
   try {
 
-    const Data = {
+    const data = {
       name: req.body.name,
       birth: req.body.birth,
       oranization: req.body.oranization,
@@ -120,11 +119,11 @@ exports.reqSeoulight = async (req, res, next) => {
       email: req.body.email,
       phone: req.body.phone,
       intro: req.body.intro,
-      user_idx: req.body.userIdx
+      user_idx: req.userIdx
     };
       // 어떻게 처리해야할지 모르겠음 ----------트랜잭션 처리 해야하나? -경인-
-    await userModel.reqSeoulight(Data);
-    await userModel.editRole(Data.user_idx);
+    await userModel.reqSeoulight(data);
+    await userModel.editRole(data.user_idx);
 
   } catch (error) {
     return next(error);

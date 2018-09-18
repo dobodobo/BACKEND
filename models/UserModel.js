@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const config = require('../config/config');
 const pool = config.pool;
+const transactionWrapper = require('./TransactionWrapper');
 
 
 exports.checkEmail = (email) => {
@@ -56,9 +57,10 @@ exports.getUserByIdx = (idx) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
-      SELECT idx, email, nick, avatar, salt, role
-      FROM user
-      WHERE idx = ?;
+      SELECT u.idx as uIdx, u.email, nick, avatar, salt, role, s.idx sIdx
+      FROM user u
+      LEFT JOIN seoullight s on u.idx = s.user_idx
+      WHERE u.idx = ?;
       `;
 
     pool.query(sql, [idx], (err, rows) => {
