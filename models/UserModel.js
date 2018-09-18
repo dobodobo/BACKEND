@@ -80,11 +80,11 @@ exports.signup = (user) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
-      INSERT INTO user(email, pwd, nick, avatar, salt, role)
+      INSERT INTO user(email, pwd, nick, avatar, salt)
       VALUES (?, ?, ?, ?, ?, ?);
       `;
 
-    pool.query(sql, [user.email, user.pwd, user.nick, user.avatar, user.salt, "NORMAL"], (err, rows) => {
+    pool.query(sql, [user.email, user.pwd, user.nick, user.avatar, user.salt], (err, rows) => {
       if (err) {
         reject(err);
       } else {
@@ -157,11 +157,35 @@ exports.editUser = (user) => {
     const sql =
       `
     UPDATE user
-    SET pwd = ? , salt = ? , nick = ? , avatar = ?
+    SET pwd = ? , salt = ? , nick = ? 
     WHERE idx = ?
     `
 
-    pool.query(sql, [user.pwd, user.salt, user.nick, user.avatar, user.idx], (err, rows) => {
+    pool.query(sql, [user.pwd, user.salt, user.nick, user.idx], (err, rows) => {
+
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
+/*
+    프로필 사진 수정
+    writed by 경인
+*/
+exports.editAvatar = (user) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+    UPDATE user
+    SET avatar = ?
+    WHERE idx = ?
+    `
+
+    pool.query(sql, [user.avatar, user.idx], (err, rows) => {
 
       if (err) {
         reject(err);
@@ -197,7 +221,7 @@ exports.editRole = (idx) => {
   });
 };
 
-exports.seoulight = (sData) => {
+exports.reqSeoulight = (sData) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
