@@ -24,6 +24,9 @@ module.exports = (router) => {
   router.route('/users/seoulight') //시민해설사 신청
     .post(authCtrl.auth,userCtrl.reqSeoulight);
 
+  router.route('/users/feedback') //건의사항 
+  .post(authCtrl.auth,userCtrl.addFeedback);
+
   // DOBO WITH SEOULITE
   router.route('/dobo/seoulite')
     .post(authCtrl.auth, imageUtil.uploadArray, doboSTLECtrl.register);

@@ -121,9 +121,7 @@ exports.reqSeoulight = async (req, res, next) => {
       intro: req.body.intro,
       user_idx: req.userIdx
     };
-      // 어떻게 처리해야할지 모르겠음 ----------트랜잭션 처리 해야하나? -경인-
     await userModel.reqSeoulight(data);
-    await userModel.editRole(data.user_idx);
 
   } catch (error) {
     return next(error);
@@ -131,3 +129,27 @@ exports.reqSeoulight = async (req, res, next) => {
 
   return res.r();
 };
+
+/*
+    건의사항 등록
+    Writed By 정경인
+*/
+exports.addFeedback = async (req, res, next) => {
+
+
+  try {
+
+    const reqData = {
+      title: req.body.title,
+      content : req.body.content,
+      user_idx: req.userIdx
+    };
+
+    await userModel.addFeedback(reqData);
+
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.r();
+}
