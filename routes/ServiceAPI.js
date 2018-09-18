@@ -14,8 +14,18 @@ module.exports = (router) => {
 
   router.route('/users/signin')
     .post(userCtrl.signin);
+   
+  router.route('/users/info')
+    .put(authCtrl.auth,userCtrl.editUser);
 
+  router.route('/users/avatar')
+    .put(authCtrl.auth,userCtrl.editAvatar);
 
+  router.route('/users/seoulight') //시민해설사 신청
+    .post(authCtrl.auth,userCtrl.reqSeoulight);
+
+  router.route('/users/feedback') //건의사항 
+  .post(authCtrl.auth,userCtrl.addFeedback);
 
   // DOBO WITH SEOULITE
   router.route('/dobo/seoulite')

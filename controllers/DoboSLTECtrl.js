@@ -10,7 +10,6 @@ exports.register = async(req, res, next) => {
 
   try {
 
-
     console.log(req.userIdx);
     const user = await userModel.getUserByIdx(req.userIdx);
     if (user.role !== 'SEOULITE') {
