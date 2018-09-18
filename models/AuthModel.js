@@ -21,7 +21,7 @@ exports.auth = (token, done) => {
           return done(err.message);
       }
     } else {
-      const sql = `SELECT idx FROM Users WHERE email = ?`;
+      const sql = `SELECT idx FROM user WHERE email = ?`;
 
       pool.query(sql, [decoded.email], (err, rows) => {
         if (err) {
