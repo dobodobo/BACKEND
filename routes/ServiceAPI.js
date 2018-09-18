@@ -10,6 +10,13 @@ module.exports = (router) => {
   router.route('/users/signin')
     .post(userCtrl.signin);
 
+  
+  router.route('/users')
+    .put(userCtrl.editUser);
+
+
+  router.route('/users/seoulight') //시민해설사 신청
+  .post(userCtrl.seoulight);
 
 
   return router;
