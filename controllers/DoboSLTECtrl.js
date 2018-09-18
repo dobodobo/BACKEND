@@ -10,18 +10,37 @@ exports.register = async(req, res, next) => {
 
   try {
 
-
-    console.log(req.userIdx);
     const user = await userModel.getUserByIdx(req.userIdx);
     if (user.role !== 'SEOULITE') {
       return next(9402);
     }
 
+    const tempCourse = [
+      {
+        category: 1,
+        name: 'a'
+      },
+      {
+        category: 2,
+        name: 'b'
+      },
+      {
+        category: 3,
+        name: 'c'
+      },
+    ];
 
-    console.log(req.files);
-    let images = [];
-    req.files ? req.files.map(file => images.push(file.location)) : images.push(null);
+    const extraData = {
+      bgi: [],
+      tour: [],
+      course: []
+    };
+    req.files.bgi ? req.files.bgi.map(file => extraData.bgi.push(file.location)) : extraData.bgi.push(null);
+    req.files.tour ? req.files.tour.map((file, idx) => extraData.tour.push([file.location, req.body.tour_name[idx]])) : extraData.tour.push(null, null);
+    // req.body.course ? req.body.course(item => extraData.course.push(item.category, item.name)) : extraData.course.push(null, null);
+    tempCourse ? tempCourse.map(item => extraData.course.push([item.category, item.name])) : extraData.course.push(null, null);
 
+    
     const reqData = {
       seoullight_idx: user.sIdx,
       title: req.body.title,
@@ -35,7 +54,7 @@ exports.register = async(req, res, next) => {
       status: DOBO_STATUS.WAITING
     };
 
-    await doboSTLEModel.register(reqData, images);
+    await doboSTLEModel.register(reqData, extraData);
 
 
   } catch (error) {

@@ -30,7 +30,7 @@ const transactionWrapper = require('./TransactionWrapper');
 //     })
 // };
 
-exports.register = (data, images) => {
+exports.register = (data, extraData) => {
 
   let insertedIdx;
   return new Promise((resolve, reject) => {
@@ -59,10 +59,10 @@ exports.register = (data, images) => {
       })
       .then(context => {
         return new Promise((resolve, reject) => {
-          let imageArr = [];
-          for (let i = 0; i < images.length; i++) {
-            imageArr[i] = [insertedIdx];
-            imageArr[i].push(images[i]);
+          let bgiArr = [];
+          for (let i = 0; i < extraData.bgi.length; i++) {
+            bgiArr[i] = [insertedIdx];
+            bgiArr[i].push(extraData.bgi[i]);
           }
           const sql =
             `
@@ -70,16 +70,78 @@ exports.register = (data, images) => {
             VALUES ?;
             `;
 
-          context.conn.query(sql, [imageArr], (err, rows) => {
+          context.conn.query(sql, [bgiArr], (err, rows) => {
             if (err) {
               context.error = err;
               reject(context);
             } else {
-              if (rows.affectedRows === images.length) {
+              if (rows.affectedRows === extraData.bgi.length) {
                 context.result = rows;
                 resolve(context);
               } else {
                 context.error = new Error("CUSTOM ERROR IN INSERT DOBO IMAGE");
+                reject(context);
+              }
+            }
+          })
+        })
+      })
+      .then(context => {
+        return new Promise((resolve, reject) => {
+
+          let tourArr = [];
+          for (let i = 0; i < extraData.tour.length; i++) {
+            tourArr[i] = [insertedIdx];
+            tourArr[i].push(...extraData.tour[i]);
+          }
+
+          const sql =
+            `
+            INSERT INTO citizen_tourlist(citizen_dobo_idx, image, name)
+            VALUES ?;
+            `;
+
+          context.conn.query(sql, [tourArr], (err, rows) => {
+            if (err) {
+              context.error = err;
+              reject(context);
+            } else {
+              if (rows.affectedRows === extraData.tour.length) {
+                context.result = rows;
+                resolve(context)
+              } else {
+                context.error = new Error("CUSTOM ERROR IN INSERT TOURLIST IMAGE")
+                reject(context);
+              }
+            }
+          })
+        })
+      })
+      .then(context => {
+        return new Promise((resolve, reject) => {
+
+          let courseArr = [];
+          for (let i = 0; i < extraData.course.length; i++) {
+            courseArr[i] = [insertedIdx];
+            courseArr[i].push(...extraData.course[i]);
+          }
+
+          console.log(courseArr);
+          const sql =
+            `
+            INSERT INTO citizen_course(citizen_dobo_idx, category, name)
+            VALUES ?;
+            `;
+          context.conn.query(sql, [courseArr], (err, rows) => {
+            if (err) {
+              context.error = err;
+              reject(context);
+            } else {
+              if (rows.affectedRows === extraData.course.length) {
+                context.result = rows;
+                resolve(context);
+              } else {
+                context.error = new Error("CUSTOM ERROR IN INSERT COURSE");
                 reject(context);
               }
             }
@@ -99,3 +161,4 @@ exports.register = (data, images) => {
       })
   })
 };
+
