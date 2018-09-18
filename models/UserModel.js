@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const config = require('../config/config');
 const pool = config.pool;
+const transactionWrapper = require('./TransactionWrapper');
 
 
 exports.checkEmail = (email) => {
@@ -62,7 +63,7 @@ exports.getUserByIdx = (idx) => {
       WHERE u.idx = ?;
       `;
 
-    pool.query(sql, [idx], (err, rows)=> {
+    pool.query(sql, [idx], (err, rows) => {
       if (err) {
         reject(err);
       } else {
@@ -82,7 +83,7 @@ exports.signup = (user) => {
     const sql =
       `
       INSERT INTO user(email, pwd, nick, avatar, salt)
-      VALUES (?, ?, ?, ?, ?);
+      VALUES (?, ?, ?, ?, ?, ?);
       `;
 
     pool.query(sql, [user.email, user.pwd, user.nick, user.avatar, user.salt], (err, rows) => {
@@ -122,7 +123,7 @@ exports.signin = (user) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
-      SELECT idx, email, nick, avatar
+      SELECT idx, email, nick, avatar, role
       FROM user
       WHERE email = ? AND pwd = ?;
       ;
@@ -140,11 +141,142 @@ exports.signin = (user) => {
             email: rows[0].email
           };
 
-          const token = jwt.sign(profile, config.jwt.cert, {"expiresIn": "10h"});
+          const token = jwt.sign(profile, config.jwt.cert, { "expiresIn": "10h" });
 
-          const result = {profile, token};
+          const result = { profile, token };
           resolve(result);
         }
+      }
+    });
+  });
+};
+/*
+    회원 정보 수정
+    writed by 경인
+*/
+exports.editUser = (user) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+    UPDATE user
+    SET pwd = ? , salt = ? , nick = ? 
+    WHERE idx = ?
+    `
+
+    pool.query(sql, [user.pwd, user.salt, user.nick, user.idx], (err, rows) => {
+
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
+/*
+    프로필 사진 수정
+    writed by 경인
+*/
+exports.editAvatar = (user) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+    UPDATE user
+    SET avatar = ?
+    WHERE idx = ?
+    `
+
+    pool.query(sql, [user.avatar, user.idx], (err, rows) => {
+
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
+
+/*
+    시민해설사 신청
+    writed by 경인
+*/
+
+exports.reqSeoulight = (sData) => {
+  return new Promise((resolve, reject) => {
+    transactionWrapper.getConnection(pool)
+      .then(transactionWrapper.beginTransaction)
+      .then(context => {
+        return new Promise((resolve, reject) => {
+
+          const sql =
+            `
+      INSERT INTO seoullight(name, birth, organization, portfolio, email, phone, intro, image, user_idx)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+      `;
+
+          context.conn.query(sql, [sData.name, sData.birth, sData.organization, sData.portfolio, sData.email, sData.phone, sData.intro, sData.image, sData.user_idx], (err, rows) => {
+            if (err) {
+              reject(context);
+            } else {
+              resolve(context);
+            }
+          })
+        })
+
+      })
+      .then(context => {
+        return new Promise((resolve, reject) => {
+          const sql =
+            `
+             UPDATE user
+             SET role = ?
+             WHERE idx = ?
+            `
+
+          context.conn.query(sql, ["SEOULITE", sData.user_idx], (err, rows) => {
+            if (err) {
+              reject(context);
+            } else {
+              resolve(context);
+            }
+          });
+        });
+      })
+      .then(transactionWrapper.commitTransaction)
+      .then(context => {
+        context.conn.release();
+        resolve(context.result);
+      })
+      .catch(context => {
+        context.conn.rollback(() => {
+          context.conn.release();
+          reject(context.error);
+        })
+      })
+  })
+}
+
+/*
+    건의사항 등록
+    writed by 경인
+*/
+
+exports.addFeedback = (fb) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      INSERT INTO feedback(title,content,user_idx)
+      VALUES (?, ?, ?);
+      `;
+
+    pool.query(sql, [fb.title, fb.content, fb.user_idx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
       }
     });
   });
