@@ -56,9 +56,10 @@ exports.getUserByIdx = (idx) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
-      SELECT idx, email, nick, avatar, salt
-      FROM user
-      WHERE idx = ?;
+      SELECT u.idx as uIdx, u.email, nick, avatar, salt, role, s.idx sIdx
+      FROM user u
+      LEFT JOIN seoullight s on u.idx = s.user_idx
+      WHERE u.idx = ?;
       `;
 
     pool.query(sql, [idx], (err, rows)=> {
