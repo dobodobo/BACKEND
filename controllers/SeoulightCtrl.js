@@ -16,7 +16,7 @@ exports.reqSeoulight = async (req, res, next) => {
         phone: req.body.phone,
         intro: req.body.intro,
         user_idx: req.userIdx,
-        role : "SOUELITE"
+        role : "SEOULITE"
       };
       await seoulightModel.reqSeoulight(data);
   

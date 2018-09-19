@@ -83,7 +83,7 @@ exports.signup = (user) => {
     const sql =
       `
       INSERT INTO user(email, pwd, nick, avatar, salt)
-      VALUES (?, ?, ?, ?, ?, ?);
+      VALUES (?, ?, ?, ?, ?);
       `;
 
     pool.query(sql, [user.email, user.pwd, user.nick, user.avatar, user.salt], (err, rows) => {
@@ -141,8 +141,7 @@ exports.signin = (user) => {
             email: rows[0].email
           };
 
-          const token = jwt.sign(profile, config.jwt.cert, {"expiresIn": "1000h"});
-
+          const token = jwt.sign(profile, config.jwt.cert, { "expiresIn": "10h" });
 
           const result = { profile, token };
           resolve(result);
@@ -214,6 +213,53 @@ exports.addFeedback = (fb) => {
       `;
 
     pool.query(sql, [fb.title, fb.content, fb.user_idx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
+/*
+    신청 관광리스트 가져오기 
+    writed by 경인
+*/
+exports.getAskingList= (idx) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `       
+      SELECT  d.idx as dIdx, title , content, image, d.status
+      FROM citizen_reserve as r
+      LEFT JOIN citizen_dobo as d on citizen_dobo_idx = d.idx
+      WHERE user_idx = ?;
+      `;
+
+    pool.query(sql, [idx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
+/*
+    개설 관광리스트 가져오기 
+    writed by 경인
+*/
+exports.getMadeList= (sIdx) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `       
+      SELECT  title , content, image, status
+      FROM citizen_dobo
+      WHERE seoullight_idx = ?;
+      `;
+
+    pool.query(sql, [sIdx], (err, rows) => {
       if (err) {
         reject(err);
       } else {

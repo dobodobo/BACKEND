@@ -28,6 +28,9 @@ module.exports = (router) => {
   router.route('/users/feedback') //건의사항 
   .post(authCtrl.auth,userCtrl.addFeedback);
 
+  router.route('/users/mypage') //마이페이지
+  .get(authCtrl.auth,userCtrl.getMypage);
+
   // DOBO WITH SEOULITE
   router.route('/seoulite')
     .get(authCtrl.auth, doboSTLECtrl.getList)

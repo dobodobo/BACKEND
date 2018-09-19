@@ -81,7 +81,7 @@ exports.editPwd = async (req, res, next) => {
   return res.r();
 }
 /*
-    프로필 사진 수정                              //미 완 성 !!!!!!!!! 
+    프로필 사진 수정     
     Writed By 정경인
 */
 exports.editAvatar = async (req, res, next) => {
@@ -126,4 +126,36 @@ exports.addFeedback = async (req, res, next) => {
   }
 
   return res.r();
+}
+
+
+/*
+    마이페이지 
+    writed by 경인
+*/
+exports.getMypage= async (req, res, next) => {
+  let reqData;
+  try {
+
+
+    const user = await userModel.getUserByIdx(req.userIdx);
+    const askTourList = await userModel.getAskingList(req.userIdx);
+    const madeTourList = ( user.role == "SEOULITE" ) ? await userModel.getMadeList(user.sIdx) : []   //유저: null ,해설사 : 배열 
+    reqData = {
+      email: user.email,
+      nick: user.nick,
+      avatar: user.avatar,
+      role: user.role,
+      askTourList : askTourList,
+      madeTourList: madeTourList
+
+
+    };
+
+
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.r(reqData);
 }
