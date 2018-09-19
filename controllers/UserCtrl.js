@@ -57,10 +57,10 @@ exports.signin = async (req, res, next) => {
 };
 
 /*
-    회원 정보 수정
+    비밀번호 수정
     Writed By 정경인
 */
-exports.editUser = async (req, res, next) => {
+exports.editPwd = async (req, res, next) => {
 
 
   try {
@@ -69,11 +69,10 @@ exports.editUser = async (req, res, next) => {
     const reqData = {
       idx: req.userIdx,
       pwd : secretData.pw,
-      salt : secretData._salt,
-      nick : req.body.nick
+      salt : secretData._salt
     };
 
-    await userModel.editUser(reqData);
+    await userModel.editPwd(reqData);
 
   } catch (error) {
     return next(error);
@@ -82,7 +81,7 @@ exports.editUser = async (req, res, next) => {
   return res.r();
 }
 /*
-    프로필 사진 수정
+    프로필 사진 수정                              //미 완 성 !!!!!!!!! 
     Writed By 정경인
 */
 exports.editAvatar = async (req, res, next) => {
@@ -90,9 +89,10 @@ exports.editAvatar = async (req, res, next) => {
 
   try {
 
+    // console.log(req)
     const reqData = {
       idx: req.userIdx,
-      avatar: req.file 
+      avatar: req.file.location
     };
 
     await userModel.editAvatar(reqData);
@@ -103,32 +103,6 @@ exports.editAvatar = async (req, res, next) => {
 
   return res.r();
 }
-/*
-    시민 해설사 신청
-    Writed By 정경인
-*/
-exports.reqSeoulight = async (req, res, next) => {
-
-  try {
-
-    const data = {
-      name: req.body.name,
-      birth: req.body.birth,
-      oranization: req.body.oranization,
-      portfolio: req.body.portfolio,
-      email: req.body.email,
-      phone: req.body.phone,
-      intro: req.body.intro,
-      user_idx: req.userIdx
-    };
-    await userModel.reqSeoulight(data);
-
-  } catch (error) {
-    return next(error);
-  }
-
-  return res.r();
-};
 
 /*
     건의사항 등록

@@ -4,6 +4,7 @@ const imageUtil = require('../ImageUtil');
 
 const authCtrl = require('../controllers/AuthCtrl');
 const userCtrl = require('../controllers/UserCtrl');
+const seoulightCtrl = require('../controllers/SeoulightCtrl');
 const doboSTLECtrl = require('../controllers/DoboSLTECtrl');
 
 module.exports = (router) => {
@@ -15,14 +16,14 @@ module.exports = (router) => {
   router.route('/users/signin')
     .post(userCtrl.signin);
    
-  router.route('/users/info')
-    .put(authCtrl.auth,userCtrl.editUser);
+  router.route('/users/pwd') //정보 수정
+    .put(authCtrl.auth,userCtrl.editPwd);
 
-  router.route('/users/avatar')
-    .put(authCtrl.auth,userCtrl.editAvatar);
+  router.route('/users/avatar') //사진 수정
+    .put(authCtrl.auth, imageUtil.uploadSingle, userCtrl.editAvatar);
 
-  router.route('/users/seoulight') //시민해설사 신청
-    .post(authCtrl.auth,userCtrl.reqSeoulight);
+  router.route('/seoulight/register') //시민해설사 신청
+    .post(authCtrl.auth, seoulightCtrl.reqSeoulight);
 
   router.route('/users/feedback') //건의사항 
   .post(authCtrl.auth,userCtrl.addFeedback);

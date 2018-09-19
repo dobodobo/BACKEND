@@ -151,19 +151,19 @@ exports.signin = (user) => {
   });
 };
 /*
-    회원 정보 수정
+    비밀번호 수정
     writed by 경인
 */
-exports.editUser = (user) => {
+exports.editPwd = (user) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
     UPDATE user
-    SET pwd = ? , salt = ? , nick = ? 
+    SET pwd = ? , salt = ? 
     WHERE idx = ?
     `
 
-    pool.query(sql, [user.pwd, user.salt, user.nick, user.idx], (err, rows) => {
+    pool.query(sql, [user.pwd, user.salt, user.idx], (err, rows) => {
 
       if (err) {
         reject(err);
@@ -199,71 +199,11 @@ exports.editAvatar = (user) => {
 };
 
 
-/*
-    시민해설사 신청
-    writed by 경인
-*/
-
-exports.reqSeoulight = (sData) => {
-  return new Promise((resolve, reject) => {
-    transactionWrapper.getConnection(pool)
-      .then(transactionWrapper.beginTransaction)
-      .then(context => {
-        return new Promise((resolve, reject) => {
-
-          const sql =
-            `
-      INSERT INTO seoullight(name, birth, organization, portfolio, email, phone, intro, image, user_idx)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-      `;
-
-          context.conn.query(sql, [sData.name, sData.birth, sData.organization, sData.portfolio, sData.email, sData.phone, sData.intro, sData.image, sData.user_idx], (err, rows) => {
-            if (err) {
-              reject(context);
-            } else {
-              resolve(context);
-            }
-          })
-        })
-
-      })
-      .then(context => {
-        return new Promise((resolve, reject) => {
-          const sql =
-            `
-             UPDATE user
-             SET role = ?
-             WHERE idx = ?
-            `
-
-          context.conn.query(sql, ["SEOULITE", sData.user_idx], (err, rows) => {
-            if (err) {
-              reject(context);
-            } else {
-              resolve(context);
-            }
-          });
-        });
-      })
-      .then(transactionWrapper.commitTransaction)
-      .then(context => {
-        context.conn.release();
-        resolve(context.result);
-      })
-      .catch(context => {
-        context.conn.rollback(() => {
-          context.conn.release();
-          reject(context.error);
-        })
-      })
-  })
-}
 
 /*
     건의사항 등록
     writed by 경인
 */
-
 exports.addFeedback = (fb) => {
   return new Promise((resolve, reject) => {
     const sql =
