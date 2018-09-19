@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../config/config');
-
+const {USER_ROLE} = require('../Constant');
 const userModel = require('../models/UserModel');
 
 exports.signup = async (req, res, next) => {
@@ -159,3 +159,32 @@ exports.getMypage= async (req, res, next) => {
 
   return res.r(reqData);
 }
+
+/*
+    시민해설사 신청
+    writed by 경인
+*/
+exports.reqSeoulight = async (req, res, next) => {
+
+    try {
+  
+      const data = {
+        name: req.body.name,
+        birth: req.body.birth,
+        oranization: req.body.oranization,
+        portfolio: req.body.portfolio,
+        email: req.body.email,
+        phone: req.body.phone,
+        intro: req.body.intro,
+        user_idx: req.userIdx,
+        role : USER_ROLE.SEOULITE
+      };
+      await userModel.reqSeoulight(data);
+  
+    } catch (error) {
+      return next(error);
+    }
+  
+    return res.r();
+  };
+  
