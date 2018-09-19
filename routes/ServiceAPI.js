@@ -29,9 +29,15 @@ module.exports = (router) => {
   .post(authCtrl.auth,userCtrl.addFeedback);
 
   // DOBO WITH SEOULITE
-  router.route('/dobo/seoulite')
-    .post(authCtrl.auth, imageUtil.uploadArray, doboSTLECtrl.register);
+  router.route('/seoulite')
+    .get(authCtrl.auth, doboSTLECtrl.getList)
+    .post(authCtrl.auth, imageUtil.uploadFields, doboSTLECtrl.register);
 
+  router.route('/seoulite/:dobo_idx')
+    .get(authCtrl.auth, doboSTLECtrl.getDetail);
+
+  router.route('/seoulite/:dobo_idx/review')
+    .post(authCtrl.auth, doboSTLECtrl.createReview);
 
 
 

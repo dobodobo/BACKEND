@@ -22,4 +22,4 @@ const storageS3 = multerS3({
 
 exports.uploadSingle = multer({storage: storageS3}).single('avatar');
 exports.uploadArray = multer({storage: storageS3}).array('images', 5);
-// exports.uploadFileds = multer({storage: storageS3}).fields('images');
+exports.uploadFields = multer({storage: storageS3}).fields([{name:'bgi'}, {name: 'tour'}, {name: 'course'}]);

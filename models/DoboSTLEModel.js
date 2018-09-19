@@ -7,30 +7,7 @@ const pool = config.pool;
 const transactionWrapper = require('./TransactionWrapper');
 
 
-// exports.register = (data) => {
-//   return new Promise((resolve, reject) => {
-//     // const sql = `INSERT INTO citizen_dobo(title, content, min_people, max_people, category, start_date, end_date, due_date, status, seoullite_idx)`;
-//     const sql =
-//       `
-//       INSERT INTO citizen_dobo SET ?;
-//       `;
-//
-//     pool.query(sql, [data], (err, rows) => {
-//       if (err) {
-//         reject(err);
-//       } else {
-//         resolve(rows);
-//       }
-//     })
-//   })
-//     .then((result) => {
-//       return new Promise((resolve,reject) => {
-//
-//       })
-//     })
-// };
-
-exports.register = (data, images) => {
+exports.register = (data, extraData) => {
 
   let insertedIdx;
   return new Promise((resolve, reject) => {
@@ -59,10 +36,10 @@ exports.register = (data, images) => {
       })
       .then(context => {
         return new Promise((resolve, reject) => {
-          let imageArr = [];
-          for (let i = 0; i < images.length; i++) {
-            imageArr[i] = [insertedIdx];
-            imageArr[i].push(images[i]);
+          let bgiArr = [];
+          for (let i = 0; i < extraData.bgi.length; i++) {
+            bgiArr[i] = [insertedIdx];
+            bgiArr[i].push(extraData.bgi[i]);
           }
           const sql =
             `
@@ -70,16 +47,78 @@ exports.register = (data, images) => {
             VALUES ?;
             `;
 
-          context.conn.query(sql, [imageArr], (err, rows) => {
+          context.conn.query(sql, [bgiArr], (err, rows) => {
             if (err) {
               context.error = err;
               reject(context);
             } else {
-              if (rows.affectedRows === images.length) {
+              if (rows.affectedRows === extraData.bgi.length) {
                 context.result = rows;
                 resolve(context);
               } else {
                 context.error = new Error("CUSTOM ERROR IN INSERT DOBO IMAGE");
+                reject(context);
+              }
+            }
+          })
+        })
+      })
+      .then(context => {
+        return new Promise((resolve, reject) => {
+
+          let tourArr = [];
+          for (let i = 0; i < extraData.tour.length; i++) {
+            tourArr[i] = [insertedIdx];
+            tourArr[i].push(...extraData.tour[i]);
+          }
+
+          const sql =
+            `
+            INSERT INTO citizen_tourlist(citizen_dobo_idx, image, name)
+            VALUES ?;
+            `;
+
+          context.conn.query(sql, [tourArr], (err, rows) => {
+            if (err) {
+              context.error = err;
+              reject(context);
+            } else {
+              if (rows.affectedRows === extraData.tour.length) {
+                context.result = rows;
+                resolve(context)
+              } else {
+                context.error = new Error("CUSTOM ERROR IN INSERT TOURLIST IMAGE")
+                reject(context);
+              }
+            }
+          })
+        })
+      })
+      .then(context => {
+        return new Promise((resolve, reject) => {
+
+          let courseArr = [];
+          for (let i = 0; i < extraData.course.length; i++) {
+            courseArr[i] = [insertedIdx];
+            courseArr[i].push(...extraData.course[i]);
+          }
+
+          console.log(courseArr);
+          const sql =
+            `
+            INSERT INTO citizen_course(citizen_dobo_idx, category, name)
+            VALUES ?;
+            `;
+          context.conn.query(sql, [courseArr], (err, rows) => {
+            if (err) {
+              context.error = err;
+              reject(context);
+            } else {
+              if (rows.affectedRows === extraData.course.length) {
+                context.result = rows;
+                resolve(context);
+              } else {
+                context.error = new Error("CUSTOM ERROR IN INSERT COURSE");
                 reject(context);
               }
             }
@@ -98,4 +137,105 @@ exports.register = (data, images) => {
         })
       })
   })
+};
+
+
+exports.getList = () => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `SELECT cd.idx,
+       cd.min_people,
+       cd.max_people,
+       cd.lang
+       cd.title,
+       cd.content,
+       cd.category,
+       cd.due_date,
+       cd.status,
+       cd.image
+FROM citizen_dobo AS cd;`;
+
+    pool.query(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  })
+};
+
+
+
+exports.createReview = (data) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      INSERT INTO citizen_review SET ?;
+      `;
+    pool.query(sql, [data], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  });
+};
+
+
+
+exports.getDetail = (idx) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      SELECT cd.idx,
+       cd.title,
+       cd.content,
+       cd.min_people,
+       cd.max_people,
+       cd.category,
+       cd.lang,
+       cd.start_date,
+       cd.end_date,
+       cd.due_date,
+       cd.status,
+       GROUP_CONCAT(DISTINCT cc.name, '|', cc.category) AS course,
+       GROUP_CONCAT(DISTINCT ci.image) AS bgi,
+       GROUP_CONCAT(DISTINCT ct.name, '|', ct.image) AS tourlist
+      FROM citizen_dobo AS cd
+             LEFT JOIN citizen_course cc on cd.idx = cc.citizen_dobo_idx
+             LEFT JOIN citizen_image ci on cd.idx = ci.citizen_dobo_idx
+             LEFT JOIN citizen_tourlist ct on cd.idx = ct.citizen_dobo_idx
+      WHERE cd.idx = ?;
+      `;
+
+    pool.query(sql, idx, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  });
+};
+
+exports.getReviewByDoboIdx = (doboIdx) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      SELECT cr.idx, cr.content, DATE_FORMAT(cr.created, '%Y.%m.%d') AS created, u.idx as uIdx, u.nick
+      FROM citizen_review cr
+      LEFT JOIN user u on cr.user_idx = u.idx
+      WHERE citizen_dobo_idx = ?;
+      `;
+
+    pool.query(sql, [doboIdx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  });
 };

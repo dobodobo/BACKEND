@@ -141,7 +141,8 @@ exports.signin = (user) => {
             email: rows[0].email
           };
 
-          const token = jwt.sign(profile, config.jwt.cert, { "expiresIn": "10h" });
+          const token = jwt.sign(profile, config.jwt.cert, {"expiresIn": "1000h"});
+
 
           const result = { profile, token };
           resolve(result);
