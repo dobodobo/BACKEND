@@ -39,8 +39,8 @@ exports.reqSeoulight = (sData) => {
               `
                UPDATE user
                SET role = ?
-               WHERE idx = ?
-              `
+               WHERE idx = ?;
+              `;
   
             context.conn.query(sql, [sData.role, sData.user_idx], (err, rows) => {
               if (err) {
@@ -63,7 +63,7 @@ exports.reqSeoulight = (sData) => {
           })
         })
     })
-  }
+  };
 
   /*
     시민해설사 신청
