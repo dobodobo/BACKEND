@@ -111,38 +111,45 @@ exports.createReview = async(req, res, next) => {
 
 
 exports.getDetail = async(req, res, next) => {
-  let result;
+  let result = {};
 
   try {
 
     const doboIdx = req.params.dobo_idx;
 
-    result = await doboSTLEModel.getDetail(doboIdx);
+    const temp = await doboSTLEModel.getDetail(doboIdx);
 
     const review = await doboSTLEModel.getReviewByDoboIdx(doboIdx);
 
-    result.map((item, idx) => {
-      result[idx].bgi = item.bgi.split(',');
-      result[idx].tourlist = item.tourlist.split(',');
-      result[idx].course = item.course.split(',');
+    temp.map((item) => {
+      const {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status} = item;
+      result.dobo = {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status};
 
-      result[idx].course.map((data, id) => {
+      const {seoulite_idx, user_idx, name, avatar, email, intro, birth} = item;
+      result.dobo.seoulite = {seoulite_idx, user_idx, name, avatar, email, intro, birth};
+
+      result.dobo.bgi = item.bgi.split(',');
+      result.dobo.tourlist = item.tourlist.split(',');
+      result.dobo.course = item.course.split(',');
+
+      result.dobo.course.map((data, id) => {
         const name = data.split('|')[0];
         const category = data.split('|')[1];
-        result[idx].course[id] = {};
-        result[idx].course[id].name = name;
-        result[idx].course[id].category = category;
+        result.dobo.course[id] = {name, category};
       });
 
-      result[idx].tourlist.map((data, id) => {
+      result.dobo.tourlist.map((data, id) => {
         const name = data.split('|')[0];
         const image = data.split('|')[1];
-        result[idx].tourlist[id] = {};
-        result[idx].tourlist[id].name = name;
-        result[idx].tourlist[id].image = image;
+        result.dobo.tourlist[id] = {name, image};
       });
 
-      result[idx].review = review;
+      result.review = review;
+
+
+
+
+
     });
 
 
