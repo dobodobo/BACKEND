@@ -146,6 +146,7 @@ exports.getList = () => {
       `SELECT cd.idx,
        cd.min_people,
        cd.max_people,
+       cd.lang
        cd.title,
        cd.content,
        cd.category,
@@ -164,3 +165,20 @@ FROM citizen_dobo AS cd;`;
   })
 };
 
+
+
+exports.createReview = (data) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      INSERT INTO citizen_review SET ?;
+      `;
+    pool.query(sql, [data], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  });
+};

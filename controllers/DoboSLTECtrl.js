@@ -5,6 +5,7 @@ const userModel = require('../models/UserModel');
 const doboSTLEModel = require('../models/DoboSTLEModel');
 
 
+// 시민해설사 관광 등록
 exports.register = async(req, res, next) => {
 
 
@@ -44,6 +45,7 @@ exports.register = async(req, res, next) => {
       seoullight_idx: user.sIdx,
       title: req.body.title,
       content: req.body.content,
+      lang: req.body.lang,
       min_people: req.body.min_people,
       max_people: req.body.max_people,
       category: req.body.category,
@@ -67,6 +69,9 @@ exports.register = async(req, res, next) => {
 
 };
 
+
+// 시민해설사 전체 리스트 조회
+// TODO 인기순, 마감순 정렬 추가
 exports.getList = async(req, res, next) => {
   let result;
 
@@ -81,3 +86,26 @@ exports.getList = async(req, res, next) => {
 
   return res.r(result);
 };
+
+
+// 시민해설사 관광에 리뷰 작성
+exports.createReview = async(req, res, next) => {
+
+  try {
+
+    const reqData = {
+      user_idx: req.userIdx,
+      citizen_dobo_idx: req.params.dobo_idx,
+      content: req.body.content
+    };
+
+    await doboSTLEModel.createReview(reqData);
+
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.r();
+};
+
+
