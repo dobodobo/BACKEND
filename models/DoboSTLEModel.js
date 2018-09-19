@@ -182,3 +182,60 @@ exports.createReview = (data) => {
     })
   });
 };
+
+
+
+exports.getDetail = (idx) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      SELECT cd.idx,
+       cd.title,
+       cd.content,
+       cd.min_people,
+       cd.max_people,
+       cd.category,
+       cd.lang,
+       cd.start_date,
+       cd.end_date,
+       cd.due_date,
+       cd.status,
+       GROUP_CONCAT(DISTINCT cc.name, '|', cc.category) AS course,
+       GROUP_CONCAT(DISTINCT ci.image) AS bgi,
+       GROUP_CONCAT(DISTINCT ct.name, '|', ct.image) AS tourlist
+      FROM citizen_dobo AS cd
+             LEFT JOIN citizen_course cc on cd.idx = cc.citizen_dobo_idx
+             LEFT JOIN citizen_image ci on cd.idx = ci.citizen_dobo_idx
+             LEFT JOIN citizen_tourlist ct on cd.idx = ct.citizen_dobo_idx
+      WHERE cd.idx = ?;
+      `;
+
+    pool.query(sql, idx, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  });
+};
+
+exports.getReviewByDoboIdx = (doboIdx) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      SELECT cr.idx, cr.content, DATE_FORMAT(cr.created, '%Y.%m.%d') AS created, u.idx as uIdx, u.nick
+      FROM citizen_review cr
+      LEFT JOIN user u on cr.user_idx = u.idx
+      WHERE citizen_dobo_idx = ?;
+      `;
+
+    pool.query(sql, [doboIdx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  });
+};

@@ -109,3 +109,49 @@ exports.createReview = async(req, res, next) => {
 };
 
 
+
+exports.getDetail = async(req, res, next) => {
+  let result;
+
+  try {
+
+    const doboIdx = req.params.dobo_idx;
+
+    result = await doboSTLEModel.getDetail(doboIdx);
+
+    const review = await doboSTLEModel.getReviewByDoboIdx(doboIdx);
+
+    result.map((item, idx) => {
+      result[idx].bgi = item.bgi.split(',');
+      result[idx].tourlist = item.tourlist.split(',');
+      result[idx].course = item.course.split(',');
+
+      result[idx].course.map((data, id) => {
+        const name = data.split('|')[0];
+        const category = data.split('|')[1];
+        result[idx].course[id] = {};
+        result[idx].course[id].name = name;
+        result[idx].course[id].category = category;
+      });
+
+      result[idx].tourlist.map((data, id) => {
+        const name = data.split('|')[0];
+        const image = data.split('|')[1];
+        result[idx].tourlist[id] = {};
+        result[idx].tourlist[id].name = name;
+        result[idx].tourlist[id].image = image;
+      });
+
+      result[idx].review = review;
+    });
+
+
+
+
+
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.r(result);
+};

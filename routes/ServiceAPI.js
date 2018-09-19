@@ -22,6 +22,9 @@ module.exports = (router) => {
     .get(authCtrl.auth, doboSTLECtrl.getList)
     .post(authCtrl.auth, imageUtil.uploadFields, doboSTLECtrl.register);
 
+  router.route('/seoulite/:dobo_idx')
+    .get(authCtrl.auth, doboSTLECtrl.getDetail);
+
   router.route('/seoulite/:dobo_idx/review')
     .post(authCtrl.auth, doboSTLECtrl.createReview);
 
