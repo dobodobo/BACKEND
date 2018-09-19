@@ -1,10 +1,15 @@
 
 exports.DOBO_STATUS = {
   WAITING: 'WAITING',
-  DONE: 'DONE'
+  CLOSE: 'CLOSE'
 };
 
 exports.USER_ROLE = {
   NORMAL: 'NORMAL',
   SEOULITE: 'SEOULITE'
+};
+
+exports.RESERVE_STATUS = {
+  RESERVE: 'RESERVE',
+  CANCEL: 'CANCEL'
 };

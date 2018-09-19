@@ -59,6 +59,11 @@
     "description": "권한이 없습니다.",
     "message": "do_not_have_permission"
   },
+  "9403": {
+    "status": 403,
+    "description": "예약이 불가능한 상태입니다..",
+    "message": "do_not_reserve"
+  },
   "10401": {
     "status": 401,
     "description": "만료된 인증 토큰 입니다.",
