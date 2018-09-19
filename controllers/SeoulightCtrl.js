@@ -1,6 +1,6 @@
 'use strict';
 
-
+const {USER_ROLE} = require('../Constant');
 const seoulightModel = require('../models/SeoulightModel');
 
 exports.reqSeoulight = async (req, res, next) => {
@@ -16,7 +16,7 @@ exports.reqSeoulight = async (req, res, next) => {
         phone: req.body.phone,
         intro: req.body.intro,
         user_idx: req.userIdx,
-        role : "SEOULITE"
+        role : USER_ROLE.SEOULITE
       };
       await seoulightModel.reqSeoulight(data);
   
