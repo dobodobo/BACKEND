@@ -40,7 +40,6 @@ exports.register = async(req, res, next) => {
     // req.body.course ? req.body.course(item => extraData.course.push(item.category, item.name)) : extraData.course.push(null, null);
     tempCourse ? tempCourse.map(item => extraData.course.push([item.category, item.name])) : extraData.course.push(null, null);
 
-    
     const reqData = {
       seoullight_idx: user.sIdx,
       title: req.body.title,
@@ -51,8 +50,10 @@ exports.register = async(req, res, next) => {
       start_date: req.body.start_date,
       end_date: req.body.end_date,
       due_date: req.body.due_date,
-      status: DOBO_STATUS.WAITING
+      status: DOBO_STATUS.WAITING,
+      image: extraData.bgi[0]
     };
+
 
     await doboSTLEModel.register(reqData, extraData);
 
@@ -64,4 +65,19 @@ exports.register = async(req, res, next) => {
 
   return res.r();
 
+};
+
+exports.getList = async(req, res, next) => {
+  let result;
+
+  try {
+
+    result = await doboSTLEModel.getList();
+
+  } catch (error) {
+    return next(error);
+  }
+
+
+  return res.r(result);
 };

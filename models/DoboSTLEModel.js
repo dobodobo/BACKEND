@@ -7,29 +7,6 @@ const pool = config.pool;
 const transactionWrapper = require('./TransactionWrapper');
 
 
-// exports.register = (data) => {
-//   return new Promise((resolve, reject) => {
-//     // const sql = `INSERT INTO citizen_dobo(title, content, min_people, max_people, category, start_date, end_date, due_date, status, seoullite_idx)`;
-//     const sql =
-//       `
-//       INSERT INTO citizen_dobo SET ?;
-//       `;
-//
-//     pool.query(sql, [data], (err, rows) => {
-//       if (err) {
-//         reject(err);
-//       } else {
-//         resolve(rows);
-//       }
-//     })
-//   })
-//     .then((result) => {
-//       return new Promise((resolve,reject) => {
-//
-//       })
-//     })
-// };
-
 exports.register = (data, extraData) => {
 
   let insertedIdx;
@@ -159,6 +136,31 @@ exports.register = (data, extraData) => {
           reject(context.error);
         })
       })
+  })
+};
+
+
+exports.getList = () => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `SELECT cd.idx,
+       cd.min_people,
+       cd.max_people,
+       cd.title,
+       cd.content,
+       cd.category,
+       cd.due_date,
+       cd.status,
+       cd.image
+FROM citizen_dobo AS cd;`;
+
+    pool.query(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
   })
 };
 

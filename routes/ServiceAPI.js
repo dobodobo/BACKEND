@@ -19,6 +19,7 @@ module.exports = (router) => {
 
   // DOBO WITH SEOULITE
   router.route('/dobo/seoulite')
+    .get(authCtrl.auth, doboSTLECtrl.getList)
     .post(authCtrl.auth, imageUtil.uploadFields, doboSTLECtrl.register);
 
 
