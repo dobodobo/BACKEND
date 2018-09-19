@@ -55,3 +55,75 @@ exports.signin = async (req, res, next) => {
 
   return res.r(result);
 };
+
+/*
+    비밀번호 수정
+    Writed By 정경인
+*/
+exports.editPwd = async (req, res, next) => {
+
+
+  try {
+    const secretData = config.doCipher(req.body.pwd);
+
+    const reqData = {
+      idx: req.userIdx,
+      pwd : secretData.pw,
+      salt : secretData._salt
+    };
+
+    await userModel.editPwd(reqData);
+
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.r();
+}
+/*
+    프로필 사진 수정                              //미 완 성 !!!!!!!!! 
+    Writed By 정경인
+*/
+exports.editAvatar = async (req, res, next) => {
+
+
+  try {
+
+    // console.log(req)
+    const reqData = {
+      idx: req.userIdx,
+      avatar: req.file.location
+    };
+
+    await userModel.editAvatar(reqData);
+
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.r();
+}
+
+/*
+    건의사항 등록
+    Writed By 정경인
+*/
+exports.addFeedback = async (req, res, next) => {
+
+
+  try {
+
+    const reqData = {
+      title: req.body.title,
+      content : req.body.content,
+      user_idx: req.userIdx
+    };
+
+    await userModel.addFeedback(reqData);
+
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.r();
+}
