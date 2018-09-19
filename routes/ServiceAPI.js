@@ -5,7 +5,7 @@ const imageUtil = require('../ImageUtil');
 const authCtrl = require('../controllers/AuthCtrl');
 const userCtrl = require('../controllers/UserCtrl');
 const seoulightCtrl = require('../controllers/SeoulightCtrl');
-const doboSTLECtrl = require('../controllers/DoboSLTECtrl');
+const doboSTLCtrl = require('../controllers/DoboSLTCtrl');
 
 module.exports = (router) => {
 
@@ -28,16 +28,20 @@ module.exports = (router) => {
   router.route('/users/feedback') //건의사항 
   .post(authCtrl.auth,userCtrl.addFeedback);
 
-  // DOBO WITH SEOULITE
+  // DOBO WITH SLT
   router.route('/seoulite')
-    .get(authCtrl.auth, doboSTLECtrl.getList)
-    .post(authCtrl.auth, imageUtil.uploadFields, doboSTLECtrl.register);
+    .get(authCtrl.auth, doboSTLCtrl.getList)
+    .post(authCtrl.auth, imageUtil.uploadFields, doboSTLCtrl.register);
 
   router.route('/seoulite/:dobo_idx')
-    .get(authCtrl.auth, doboSTLECtrl.getDetail);
+    .get(authCtrl.auth, doboSTLCtrl.getDetail);
 
   router.route('/seoulite/:dobo_idx/review')
-    .post(authCtrl.auth, doboSTLECtrl.createReview);
+    .post(authCtrl.auth, doboSTLCtrl.createReview);
+
+  router.route('/seoulite/:dobo_idx/reserve')
+    .post(authCtrl.auth, doboSTLCtrl.createReserve)
+    .delete(authCtrl.auth, doboSTLCtrl.cancelReserve);
 
 
 
