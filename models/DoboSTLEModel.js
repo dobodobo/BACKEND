@@ -189,24 +189,34 @@ exports.getDetail = (idx) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
-      SELECT cd.idx,
+      SELECT
+       cd.idx,
        cd.title,
        cd.content,
        cd.min_people,
        cd.max_people,
        cd.category,
        cd.lang,
-       cd.start_date,
-       cd.end_date,
-       cd.due_date,
+       DATE_FORMAT(cd.start_date, '%Y.%m.%d') AS start_date,
+       DATE_FORMAT(cd.end_date, '%Y.%m.%d') AS end_date,
+       DATE_FORMAT(cd.due_date, '%Y.%m.%d') AS due_date,
        cd.status,
        GROUP_CONCAT(DISTINCT cc.name, '|', cc.category) AS course,
        GROUP_CONCAT(DISTINCT ci.image) AS bgi,
-       GROUP_CONCAT(DISTINCT ct.name, '|', ct.image) AS tourlist
+       GROUP_CONCAT(DISTINCT ct.name, '|', ct.image) AS tourlist,
+       s.idx AS seoulite_idx,
+       s.name,
+       u.idx AS user_idx,
+       u.avatar,
+       DATE_FORMAT(s.birth, '%Y.%m.%d'),
+       s.intro,
+       s.email
       FROM citizen_dobo AS cd
              LEFT JOIN citizen_course cc on cd.idx = cc.citizen_dobo_idx
              LEFT JOIN citizen_image ci on cd.idx = ci.citizen_dobo_idx
              LEFT JOIN citizen_tourlist ct on cd.idx = ct.citizen_dobo_idx
+             LEFT JOIN seoullight s ON cd.seoullight_idx = s.idx
+             LEFT JOIN user u on s.user_idx = u.idx
       WHERE cd.idx = ?;
       `;
 
