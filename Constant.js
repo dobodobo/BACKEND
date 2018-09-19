@@ -3,3 +3,8 @@ exports.DOBO_STATUS = {
   WAITING: 'WAITING',
   DONE: 'DONE'
 };
+
+exports.USER_ROLE = {
+  NORMAL: 'NORMAL',
+  SEOULITE: 'SEOULITE'
+};
