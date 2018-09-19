@@ -133,29 +133,18 @@ exports.getDetail = async(req, res, next) => {
       result.dobo.course = item.course.split(',');
 
       result.dobo.course.map((data, id) => {
-        const name = data.split('|')[0];
-        const category = data.split('|')[1];
+        const [name, category]  = data.split('|');
         result.dobo.course[id] = {name, category};
       });
 
       result.dobo.tourlist.map((data, id) => {
-        const name = data.split('|')[0];
-        const image = data.split('|')[1];
+        const [name, image] = data.split('|');
         result.dobo.tourlist[id] = {name, image};
       });
 
       result.review = review;
-
-
-
-
-
     });
-
-
-
-
-
+    
   } catch (error) {
     return next(error);
   }
