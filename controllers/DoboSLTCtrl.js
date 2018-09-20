@@ -77,7 +77,15 @@ exports.getList = async(req, res, next) => {
 
   try {
 
-    result = await doboSLTModel.getList();
+
+    if (!req.query.sort) {
+      result = await doboSLTModel.getListByCount();
+    } else if (req.query.sort === 'due') {
+      result = await doboSLTModel.getListByDue();
+    } else {
+      result = await doboSLTModel.getListByCount();
+    }
+
 
   } catch (error) {
     return next(error);
@@ -190,7 +198,7 @@ exports.cancelReserve = async(req, res, next) => {
 
     await doboSLTModel.cancelReserve(reqData);
 
-    // TODO 트랜잭션 추가 
+    // TODO 트랜잭션 추가
     await doboSLTModel.updateStatus(reqData);
 
   } catch (error) {
