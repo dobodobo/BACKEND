@@ -8,7 +8,6 @@ exports.signup = async (req, res, next) => {
 
   try {
 
-
     // 가입시 Email 중복 체크
     await userModel.checkEmail(req.body.email);
 
@@ -68,8 +67,8 @@ exports.editPwd = async (req, res, next) => {
 
     const reqData = {
       idx: req.userIdx,
-      pwd : secretData.pw,
-      salt : secretData._salt
+      pwd: secretData.pw,
+      salt: secretData._salt
     };
 
     await userModel.editPwd(reqData);
@@ -79,7 +78,7 @@ exports.editPwd = async (req, res, next) => {
   }
 
   return res.r();
-}
+};
 /*
     프로필 사진 수정     
     Writed By 정경인
@@ -102,7 +101,7 @@ exports.editAvatar = async (req, res, next) => {
   }
 
   return res.r();
-}
+};
 
 /*
     건의사항 등록
@@ -115,7 +114,7 @@ exports.addFeedback = async (req, res, next) => {
 
     const reqData = {
       title: req.body.title,
-      content : req.body.content,
+      content: req.body.content,
       user_idx: req.userIdx
     };
 
@@ -126,30 +125,28 @@ exports.addFeedback = async (req, res, next) => {
   }
 
   return res.r();
-}
+};
 
 
 /*
     마이페이지 
     writed by 경인
 */
-exports.getMypage= async (req, res, next) => {
+exports.getMypage = async (req, res, next) => {
   let reqData;
   try {
 
 
     const user = await userModel.getUserByIdx(req.userIdx);
     const askTourList = await userModel.getAskingList(req.userIdx);
-    const madeTourList = ( user.role == USER_ROLE.SEOULITE ) ? await userModel.getMadeList(user.sIdx) : []   //유저: null ,해설사 : 배열 
+    const madeTourList = (user.role === USER_ROLE.SEOULITE) ? await userModel.getMadeList(user.sIdx) : [];   //유저: null ,해설사 : 배열
     reqData = {
       email: user.email,
       nick: user.nick,
       avatar: user.avatar,
       role: user.role,
-      askTourList : askTourList,
+      askTourList: askTourList,
       madeTourList: madeTourList
-
-
     };
 
 
@@ -158,7 +155,7 @@ exports.getMypage= async (req, res, next) => {
   }
 
   return res.r(reqData);
-}
+};
 
 /*
     시민해설사 신청
@@ -166,25 +163,25 @@ exports.getMypage= async (req, res, next) => {
 */
 exports.reqSeoulight = async (req, res, next) => {
 
-    try {
-  
-      const data = {
-        name: req.body.name,
-        birth: req.body.birth,
-        oranization: req.body.oranization,
-        portfolio: req.body.portfolio,
-        email: req.body.email,
-        phone: req.body.phone,
-        intro: req.body.intro,
-        user_idx: req.userIdx,
-        role : USER_ROLE.SEOULITE
-      };
-      await userModel.reqSeoulight(data);
-  
-    } catch (error) {
-      return next(error);
-    }
-  
-    return res.r();
-  };
+  try {
+
+    const data = {
+      name: req.body.name,
+      birth: req.body.birth,
+      oranization: req.body.oranization,
+      portfolio: req.body.portfolio,
+      email: req.body.email,
+      phone: req.body.phone,
+      intro: req.body.intro,
+      user_idx: req.userIdx,
+      role: USER_ROLE.SEOULITE
+    };
+    await userModel.reqSeoulight(data);
+
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.r();
+};
   
