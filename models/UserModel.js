@@ -233,10 +233,10 @@ exports.getAskingList= (idx) => {
       SELECT  d.idx as dIdx, title , content, image, d.status
       FROM citizen_reserve as r
       LEFT JOIN citizen_dobo as d on citizen_dobo_idx = d.idx
-      WHERE user_idx = ?;
+      WHERE user_idx = ? AND r.status = ?; 
       `;
 
-    pool.query(sql, [idx], (err, rows) => {
+    pool.query(sql, [idx,RESERVE_STATUS.RESERVE], (err, rows) => {
       if (err) {
         reject(err);
       } else {
