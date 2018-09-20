@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../config/config');
-
+const {USER_ROLE} = require('../Constant');
 const userModel = require('../models/UserModel');
 
 exports.signup = async (req, res, next) => {
@@ -81,7 +81,7 @@ exports.editPwd = async (req, res, next) => {
   return res.r();
 }
 /*
-    프로필 사진 수정                              //미 완 성 !!!!!!!!! 
+    프로필 사진 수정     
     Writed By 정경인
 */
 exports.editAvatar = async (req, res, next) => {
@@ -127,3 +127,64 @@ exports.addFeedback = async (req, res, next) => {
 
   return res.r();
 }
+
+
+/*
+    마이페이지 
+    writed by 경인
+*/
+exports.getMypage= async (req, res, next) => {
+  let reqData;
+  try {
+
+
+    const user = await userModel.getUserByIdx(req.userIdx);
+    const askTourList = await userModel.getAskingList(req.userIdx);
+    const madeTourList = ( user.role == USER_ROLE.SEOULITE ) ? await userModel.getMadeList(user.sIdx) : []   //유저: null ,해설사 : 배열 
+    reqData = {
+      email: user.email,
+      nick: user.nick,
+      avatar: user.avatar,
+      role: user.role,
+      askTourList : askTourList,
+      madeTourList: madeTourList
+
+
+    };
+
+
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.r(reqData);
+}
+
+/*
+    시민해설사 신청
+    writed by 경인
+*/
+exports.reqSeoulight = async (req, res, next) => {
+
+    try {
+  
+      const data = {
+        name: req.body.name,
+        birth: req.body.birth,
+        oranization: req.body.oranization,
+        portfolio: req.body.portfolio,
+        email: req.body.email,
+        phone: req.body.phone,
+        intro: req.body.intro,
+        user_idx: req.userIdx,
+        role : USER_ROLE.SEOULITE
+      };
+      await userModel.reqSeoulight(data);
+  
+    } catch (error) {
+      return next(error);
+    }
+  
+    return res.r();
+  };
+  

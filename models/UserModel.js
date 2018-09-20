@@ -83,7 +83,7 @@ exports.signup = (user) => {
     const sql =
       `
       INSERT INTO user(email, pwd, nick, avatar, salt)
-      VALUES (?, ?, ?, ?, ?, ?);
+      VALUES (?, ?, ?, ?, ?);
       `;
 
     pool.query(sql, [user.email, user.pwd, user.nick, user.avatar, user.salt], (err, rows) => {
@@ -141,8 +141,7 @@ exports.signin = (user) => {
             email: rows[0].email
           };
 
-          const token = jwt.sign(profile, config.jwt.cert, {"expiresIn": "1000h"});
-
+          const token = jwt.sign(profile, config.jwt.cert, { "expiresIn": "10h" });
 
           const result = { profile, token };
           resolve(result);
@@ -222,3 +221,110 @@ exports.addFeedback = (fb) => {
     });
   });
 };
+
+/*
+    신청 관광리스트 가져오기 
+    writed by 경인
+*/
+exports.getAskingList= (idx) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `       
+      SELECT  d.idx as dIdx, title , content, image, d.status
+      FROM citizen_reserve as r
+      LEFT JOIN citizen_dobo as d on citizen_dobo_idx = d.idx
+      WHERE user_idx = ? AND r.status = ?; 
+      `;
+
+    pool.query(sql, [idx,RESERVE_STATUS.RESERVE], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
+/*
+    개설 관광리스트 가져오기 
+    writed by 경인
+*/
+exports.getMadeList= (sIdx) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `       
+      SELECT  title , content, image, status
+      FROM citizen_dobo
+      WHERE seoullight_idx = ?;
+      `;
+
+    pool.query(sql, [sIdx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
+
+/*
+    시민해설사 신청
+    writed by 경인
+*/
+exports.reqSeoulight = (sData) => {
+  return new Promise((resolve, reject) => {
+    transactionWrapper.getConnection(pool)
+      .then(transactionWrapper.beginTransaction)
+      .then(context => {
+        return new Promise((resolve, reject) => {
+
+          const sql =
+            `
+           INSERT INTO seoullight(name, birth, organization, portfolio, email, phone, intro, image, user_idx)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+           `;
+
+          context.conn.query(sql, [sData.name, sData.birth, sData.organization, sData.portfolio, sData.email, sData.phone, sData.intro, sData.image, sData.user_idx], (err, rows) => {
+            if (err) {
+              reject(context);
+            } else {
+              resolve(context);
+            }
+          })
+        })
+
+      })
+      .then(context => {
+        return new Promise((resolve, reject) => {
+          const sql =
+            `
+             UPDATE user
+             SET role = ?
+             WHERE idx = ?
+            `
+
+          context.conn.query(sql, [sData.role, sData.user_idx], (err, rows) => {
+            if (err) {
+              reject(context);
+            } else {
+              resolve(context);
+            }
+          });
+        });
+      })
+      .then(transactionWrapper.commitTransaction)
+      .then(context => {
+        context.conn.release();
+        resolve(context.result);
+      })
+      .catch(context => {
+        context.conn.rollback(() => {
+          context.conn.release();
+          reject(context.error);
+        })
+      })
+  })
+}
