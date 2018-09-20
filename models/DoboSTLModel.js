@@ -139,21 +139,64 @@ exports.register = (data, extraData) => {
 };
 
 
-exports.getList = () => {
+
+function escapeSansQuotes(connection, criterion) {
+  return connection.escape(criterion).match(/^'(\w+)'$/)[1];
+}
+
+exports.getListByCount = () => {
   return new Promise((resolve, reject) => {
     const sql =
       `
-      SELECT cd.idx,
-       cd.min_people,
-       cd.max_people,
-       cd.lang,
-       cd.title,
-       cd.content,
-       cd.category,
-       cd.due_date,
-       cd.status,
-       cd.image
-      FROM citizen_dobo AS cd;`;
+      SELECT 
+        cd.idx,
+        cd.min_people,
+        cd.max_people,
+        cd.title,
+        cd.content,
+        cd.category,
+        cd.due_date,
+        cd.status,
+        cd.image,
+        cd.lang,
+        COUNT(cr.citizen_dobo_idx) AS count
+      FROM citizen_dobo AS cd
+             LEFT JOIN citizen_review cr on cd.idx = cr.citizen_dobo_idx
+      GROUP BY cd.idx
+      ORDER BY count DESC, cd.idx DESC ;
+      `;
+
+    pool.query(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  })
+};
+
+exports.getListByDue = () => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      SELECT 
+        cd.idx,
+        cd.min_people,
+        cd.max_people,
+        cd.title,
+        cd.content,
+        cd.category,
+        cd.due_date,
+        cd.status,
+        cd.image,
+        cd.lang,
+        COUNT(cr.citizen_dobo_idx) AS count
+      FROM citizen_dobo AS cd
+             LEFT JOIN citizen_review cr on cd.idx = cr.citizen_dobo_idx
+      GROUP BY cd.idx
+      ORDER BY cd.due_date DESC, cd.idx DESC ;
+      `;
 
     pool.query(sql, [], (err, rows) => {
       if (err) {
