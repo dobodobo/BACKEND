@@ -140,7 +140,7 @@ exports.getMypage= async (req, res, next) => {
 
     const user = await userModel.getUserByIdx(req.userIdx);
     const askTourList = await userModel.getAskingList(req.userIdx);
-    const madeTourList = ( user.role == "SEOULITE" ) ? await userModel.getMadeList(user.sIdx) : []   //유저: null ,해설사 : 배열 
+    const madeTourList = ( user.role == USER_ROLE.SEOULITE ) ? await userModel.getMadeList(user.sIdx) : []   //유저: null ,해설사 : 배열 
     reqData = {
       email: user.email,
       nick: user.nick,
