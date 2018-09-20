@@ -1,8 +1,8 @@
 'use strict';
 
-const {DOBO_STATUS} = require('../Constant');
+const {DOBO_STATUS, USER_ROLE, RESERVE_STATUS} = require('../Constant');
 const userModel = require('../models/UserModel');
-const doboSTLEModel = require('../models/DoboSTLEModel');
+const doboSLTModel = require('../models/DoboSTLModel');
 
 
 // 시민해설사 관광 등록
@@ -12,7 +12,7 @@ exports.register = async(req, res, next) => {
   try {
 
     const user = await userModel.getUserByIdx(req.userIdx);
-    if (user.role !== 'SEOULITE') {
+    if (user.role !== USER_ROLE.SEOULITE) {
       return next(9402);
     }
 
@@ -57,7 +57,7 @@ exports.register = async(req, res, next) => {
     };
 
 
-    await doboSTLEModel.register(reqData, extraData);
+    await doboSLTModel.register(reqData, extraData);
 
 
   } catch (error) {
@@ -77,7 +77,7 @@ exports.getList = async(req, res, next) => {
 
   try {
 
-    result = await doboSTLEModel.getList();
+    result = await doboSLTModel.getList();
 
   } catch (error) {
     return next(error);
@@ -99,7 +99,7 @@ exports.createReview = async(req, res, next) => {
       content: req.body.content
     };
 
-    await doboSTLEModel.createReview(reqData);
+    await doboSLTModel.createReview(reqData);
 
   } catch (error) {
     return next(error);
@@ -111,47 +111,91 @@ exports.createReview = async(req, res, next) => {
 
 
 exports.getDetail = async(req, res, next) => {
-  let result;
+  let result = {};
 
   try {
 
     const doboIdx = req.params.dobo_idx;
 
-    result = await doboSTLEModel.getDetail(doboIdx);
+    const temp = await doboSLTModel.getDetail(doboIdx);
 
-    const review = await doboSTLEModel.getReviewByDoboIdx(doboIdx);
+    const review = await doboSLTModel.getReviewByDoboIdx(doboIdx);
 
-    result.map((item, idx) => {
-      result[idx].bgi = item.bgi.split(',');
-      result[idx].tourlist = item.tourlist.split(',');
-      result[idx].course = item.course.split(',');
+    temp.map((item) => {
+      const {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status} = item;
+      result.dobo = {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status};
 
-      result[idx].course.map((data, id) => {
-        const name = data.split('|')[0];
-        const category = data.split('|')[1];
-        result[idx].course[id] = {};
-        result[idx].course[id].name = name;
-        result[idx].course[id].category = category;
+      const {seoulite_idx, user_idx, name, avatar, email, intro, birth} = item;
+      result.dobo.seoulite = {seoulite_idx, user_idx, name, avatar, email, intro, birth};
+
+      result.dobo.bgi = item.bgi.split(',');
+      result.dobo.tourlist = item.tourlist.split(',');
+      result.dobo.course = item.course.split(',');
+
+      result.dobo.course.map((data, id) => {
+        const [name, category]  = data.split('|');
+        result.dobo.course[id] = {name, category};
       });
 
-      result[idx].tourlist.map((data, id) => {
-        const name = data.split('|')[0];
-        const image = data.split('|')[1];
-        result[idx].tourlist[id] = {};
-        result[idx].tourlist[id].name = name;
-        result[idx].tourlist[id].image = image;
+      result.dobo.tourlist.map((data, id) => {
+        const [name, image] = data.split('|');
+        result.dobo.tourlist[id] = {name, image};
       });
 
-      result[idx].review = review;
+      result.review = review;
     });
-
-
-
-
 
   } catch (error) {
     return next(error);
   }
 
   return res.r(result);
+};
+
+exports.createReserve = async(req, res, next) => {
+  try {
+
+    const reqData = {
+      doboIdx: req.params.dobo_idx,
+      userIdx: req.userIdx,
+      status: RESERVE_STATUS.RESERVE
+    };
+
+
+    if (!await doboSLTModel.checkReserve(reqData.doboIdx)) {
+      return next(9403);
+    }
+
+    await doboSLTModel.createReserve(reqData);
+
+    // TODO 트랜잭션 추가
+    await doboSLTModel.updateStatus(reqData);
+
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.r();
+};
+
+
+exports.cancelReserve = async(req, res, next) => {
+  try {
+
+    const reqData = {
+      doboIdx: req.params.dobo_idx,
+      userIdx: req.userIdx,
+      status: RESERVE_STATUS.CANCEL
+    };
+
+    await doboSLTModel.cancelReserve(reqData);
+
+    // TODO 트랜잭션 추가 
+    await doboSLTModel.updateStatus(reqData);
+
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.r();
 };

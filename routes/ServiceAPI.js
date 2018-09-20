@@ -30,16 +30,20 @@ module.exports = (router) => {
   router.route('/users/mypage') //마이페이지
   .get(authCtrl.auth,userCtrl.getMypage);
 
-  // DOBO WITH SEOULITE
+  // DOBO WITH SLT
   router.route('/seoulite')
-    .get(authCtrl.auth, doboSTLECtrl.getList)
-    .post(authCtrl.auth, imageUtil.uploadFields, doboSTLECtrl.register);
+    .get(authCtrl.auth, doboSTLCtrl.getList)
+    .post(authCtrl.auth, imageUtil.uploadFields, doboSTLCtrl.register);
 
   router.route('/seoulite/:dobo_idx')
-    .get(authCtrl.auth, doboSTLECtrl.getDetail);
+    .get(authCtrl.auth, doboSTLCtrl.getDetail);
 
   router.route('/seoulite/:dobo_idx/review')
-    .post(authCtrl.auth, doboSTLECtrl.createReview);
+    .post(authCtrl.auth, doboSTLCtrl.createReview);
+
+  router.route('/seoulite/:dobo_idx/reserve')
+    .post(authCtrl.auth, doboSTLCtrl.createReserve)
+    .delete(authCtrl.auth, doboSTLCtrl.cancelReserve);
 
 
 

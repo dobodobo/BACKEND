@@ -5,6 +5,7 @@ const config = require('../config/config');
 const pool = config.pool;
 
 const transactionWrapper = require('./TransactionWrapper');
+const {DOBO_STATUS} = require('../Constant');
 
 
 exports.register = (data, extraData) => {
@@ -102,8 +103,6 @@ exports.register = (data, extraData) => {
             courseArr[i] = [insertedIdx];
             courseArr[i].push(...extraData.course[i]);
           }
-
-          console.log(courseArr);
           const sql =
             `
             INSERT INTO citizen_course(citizen_dobo_idx, category, name)
@@ -143,17 +142,18 @@ exports.register = (data, extraData) => {
 exports.getList = () => {
   return new Promise((resolve, reject) => {
     const sql =
-      `SELECT cd.idx,
+      `
+      SELECT cd.idx,
        cd.min_people,
        cd.max_people,
-       cd.lang
+       cd.lang,
        cd.title,
        cd.content,
        cd.category,
        cd.due_date,
        cd.status,
        cd.image
-FROM citizen_dobo AS cd;`;
+      FROM citizen_dobo AS cd;`;
 
     pool.query(sql, [], (err, rows) => {
       if (err) {
@@ -189,24 +189,34 @@ exports.getDetail = (idx) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
-      SELECT cd.idx,
+      SELECT
+       cd.idx,
        cd.title,
        cd.content,
        cd.min_people,
        cd.max_people,
        cd.category,
        cd.lang,
-       cd.start_date,
-       cd.end_date,
-       cd.due_date,
+       DATE_FORMAT(cd.start_date, '%Y.%m.%d') AS start_date,
+       DATE_FORMAT(cd.end_date, '%Y.%m.%d') AS end_date,
+       DATE_FORMAT(cd.due_date, '%Y.%m.%d') AS due_date,
        cd.status,
        GROUP_CONCAT(DISTINCT cc.name, '|', cc.category) AS course,
        GROUP_CONCAT(DISTINCT ci.image) AS bgi,
-       GROUP_CONCAT(DISTINCT ct.name, '|', ct.image) AS tourlist
+       GROUP_CONCAT(DISTINCT ct.name, '|', ct.image) AS tourlist,
+       s.idx AS seoulite_idx,
+       s.name,
+       u.idx AS user_idx,
+       u.avatar,
+       DATE_FORMAT(s.birth, '%Y.%m.%d'),
+       s.intro,
+       s.email
       FROM citizen_dobo AS cd
              LEFT JOIN citizen_course cc on cd.idx = cc.citizen_dobo_idx
              LEFT JOIN citizen_image ci on cd.idx = ci.citizen_dobo_idx
              LEFT JOIN citizen_tourlist ct on cd.idx = ct.citizen_dobo_idx
+             LEFT JOIN seoullight s ON cd.seoullight_idx = s.idx
+             LEFT JOIN user u on s.user_idx = u.idx
       WHERE cd.idx = ?;
       `;
 
@@ -238,4 +248,195 @@ exports.getReviewByDoboIdx = (doboIdx) => {
       }
     })
   });
+};
+
+
+// reserve 테이블 추가 -> dobo.reserve_person 업데이트
+exports.createReserve = (data) => {
+  return new Promise((resolve, reject) => {
+    transactionWrapper.getConnection(pool)
+      .then(transactionWrapper.beginTransaction)
+      .then(context => {
+        return new Promise((resolve, reject) => {
+          const sql =
+            `
+            INSERT INTO citizen_reserve(citizen_dobo_idx, user_idx, status)
+            VALUES (?, ?, ?);
+            `;
+
+          context.conn.query(sql, [data.doboIdx, data.userIdx, data.status], (err, rows) => {
+            if (err) {
+              context.error = err;
+              reject(context);
+            } else {
+              context.result = rows;
+              resolve(context);
+            }
+          })
+        })
+      })
+      .then(context => {
+        return new Promise((resolve, reject) => {
+          const sql =
+            `
+            UPDATE citizen_dobo
+            SET reserve_people = reserve_people + 1
+            WHERE idx = ?;
+            `;
+          context.conn.query(sql, [data.doboIdx], (err, rows) => {
+            if (err) {
+              context.error = err;
+              reject(context);
+            } else {
+              if (rows.affectedRows === 1) {
+                context.result = rows;
+                resolve(context);
+              } else {
+                context.error = new Error('CUSTON ERROR IN UPDATE RESERVE PERSON');
+                reject(context);
+              }
+            }
+          })
+        })
+      })
+      .then(transactionWrapper.commitTransaction)
+      .then(context => {
+        context.conn.release();
+        resolve(context.result);
+      })
+      .catch(context => {
+        context.conn.rollback(() => {
+          context.conn.release();
+          reject(context.error);
+        })
+      })
+  })
+};
+
+exports.checkReserve = (doboIdx) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      SELECT min_people, max_people, reserve_people
+      FROM citizen_dobo
+      WHERE idx = ?;
+      `;
+
+    pool.query(sql, [doboIdx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        // 예약 가능한 인원이 남아 있다면 true
+        if (rows[0].max_people > rows[0].reserve_people) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      }
+    })
+  })
+};
+
+
+exports.cancelReserve = (data) => {
+  return new Promise((resolve, reject) => {
+    transactionWrapper.getConnection(pool)
+      .then(transactionWrapper.beginTransaction)
+      .then(context => {
+        return new Promise((resolve, reject) => {
+          const sql =
+            `
+            UPDATE citizen_reserve cr
+             SET cr.status = ?
+            WHERE citizen_dobo_idx = ? AND user_idx = ?;
+            `;
+
+          context.conn.query(sql, [data.status, data.doboIdx, data.userIdx], (err, rows) => {
+            if (err) {
+              context.error = err;
+              reject(context);
+            } else {
+              context.result = rows;
+              resolve(context);
+            }
+          })
+        })
+      })
+      .then(context => {
+        return new Promise((resolve, reject) => {
+          const sql =
+            `
+            UPDATE citizen_dobo
+            SET reserve_people = reserve_people - 1
+            WHERE idx = ?;
+            `;
+          context.conn.query(sql, [data.doboIdx], (err, rows) => {
+            if (err) {
+              context.error = err;
+              reject(context);
+            } else {
+              if (rows.affectedRows === 1) {
+                context.result = rows;
+                resolve(context);
+              } else {
+                context.error = new Error('CUSTON ERROR IN UPDATE RESERVE PERSON');
+                reject(context);
+              }
+            }
+          })
+        })
+      })
+      .then(transactionWrapper.commitTransaction)
+      .then(context => {
+        context.conn.release();
+        resolve(context.result);
+      })
+      .catch(context => {
+        context.conn.rollback(() => {
+          context.conn.release();
+          reject(context.error);
+        })
+      })
+  })
+};
+
+
+exports.updateStatus = (data) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      SELECT idx, min_people, max_people, reserve_people, status
+      FROM citizen_dobo
+      WHERE idx = ?;
+      `;
+    pool.query(sql, [data.doboIdx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+
+        if (rows[0].max_people === rows[0].reserve_people){
+          resolve(DOBO_STATUS.CLOSE);
+        } else if (rows[0].max_people > rows[0].reserve_people) {
+          resolve(DOBO_STATUS.WAITING)
+        }
+      }
+    })
+  })
+    .then(result => {
+      return new Promise((resolve, reject) => {
+        const sql =
+          `
+          UPDATE citizen_dobo
+          SET status = ?
+          WHERE idx = ?;
+          `;
+        pool.query(sql, [result, data.doboIdx], (err, rows) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(rows);
+          }
+        })
+      })
+    });
 };
