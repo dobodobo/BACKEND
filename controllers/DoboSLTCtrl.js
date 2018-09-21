@@ -71,7 +71,6 @@ exports.register = async(req, res, next) => {
 
 
 // 시민해설사 전체 리스트 조회
-// TODO 인기순, 마감순 정렬 추가
 exports.getList = async(req, res, next) => {
   let result;
 
