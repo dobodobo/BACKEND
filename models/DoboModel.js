@@ -1,13 +1,10 @@
 'use strict';
 
-
 const config = require('../config/config');
 const pool = config.pool;
 
 const transactionWrapper = require('./TransactionWrapper');
-const {DOBO_STATUS} = require('../Constant');
-
-
+const { DOBO_STATUS } = require('../Constant');
 
 
 /*
@@ -52,37 +49,20 @@ exports.addReview = (data) => {
       });
     };
   
-  
-
-
-
-function escapeSansQuotes(connection, criterion) {
-  return connection.escape(criterion).match(/^'(\w+)'$/)[1];
-}
-
-exports.getListByCount = () => {
+/*
+    서울관광 전체 리스트 
+    writed by 경인
+*/
+exports.getList = (category) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
-      SELECT 
-        cd.idx,
-        cd.min_people,
-        cd.max_people,
-        cd.title,
-        cd.content,
-        cd.category,
-        cd.due_date,
-        cd.status,
-        cd.image,
-        cd.lang,
-        COUNT(cr.citizen_dobo_idx) AS count
-      FROM citizen_dobo AS cd
-             LEFT JOIN citizen_review cr on cd.idx = cr.citizen_dobo_idx
-      GROUP BY cd.idx
-      ORDER BY count DESC, cd.idx DESC ;
+      SELECT idx, title, intro, image
+      FROM seoul_dobo 
+      WHERE category = ?
       `;
 
-    pool.query(sql, [], (err, rows) => {
+    pool.query(sql, [category], (err, rows) => {
       if (err) {
         reject(err);
       } else {
@@ -91,103 +71,39 @@ exports.getListByCount = () => {
     })
   })
 };
-
-exports.getListByDue = () => {
-  return new Promise((resolve, reject) => {
-    const sql =
-      `
-      SELECT 
-        cd.idx,
-        cd.min_people,
-        cd.max_people,
-        cd.title,
-        cd.content,
-        cd.category,
-        cd.due_date,
-        cd.status,
-        cd.image,
-        cd.lang,
-        COUNT(cr.citizen_dobo_idx) AS count
-      FROM citizen_dobo AS cd
-             LEFT JOIN citizen_review cr on cd.idx = cr.citizen_dobo_idx
-      GROUP BY cd.idx
-      ORDER BY cd.due_date DESC, cd.idx DESC ;
-      `;
-
-    pool.query(sql, [], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    })
-  })
-};
-
-
-
-exports.getDetail = (idx) => {
+ 
+/*
+    서울관광 글 상세페이지
+    writed by 경인
+*/
+exports.getDetail= (idx) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
       SELECT
-       cd.idx,
-       cd.title,
-       cd.content,
-       cd.min_people,
-       cd.max_people,
-       cd.category,
-       cd.lang,
-       DATE_FORMAT(cd.start_date, '%Y.%m.%d') AS start_date,
-       DATE_FORMAT(cd.end_date, '%Y.%m.%d') AS end_date,
-       DATE_FORMAT(cd.due_date, '%Y.%m.%d') AS due_date,
-       cd.status,
-       GROUP_CONCAT(DISTINCT cc.name, '|', cc.category) AS course,
-       GROUP_CONCAT(DISTINCT ci.image) AS bgi,
-       GROUP_CONCAT(DISTINCT ct.name, '|', ct.image) AS tourlist,
-       s.idx AS seoulite_idx,
-       s.name,
-       u.idx AS user_idx,
-       u.avatar,
-       DATE_FORMAT(s.birth, '%Y.%m.%d'),
-       s.intro,
-       s.email
-      FROM citizen_dobo AS cd
-             LEFT JOIN citizen_course cc on cd.idx = cc.citizen_dobo_idx
-             LEFT JOIN citizen_image ci on cd.idx = ci.citizen_dobo_idx
-             LEFT JOIN citizen_tourlist ct on cd.idx = ct.citizen_dobo_idx
-             LEFT JOIN seoullight s ON cd.seoullight_idx = s.idx
-             LEFT JOIN user u on s.user_idx = u.idx
-      WHERE cd.idx = ?;
+       sd.idx,
+       sd.title,
+       sd.intro,
+       sd.content,
+       sd.image,
+       GROUP_CONCAT(DISTINCT sc.name, '|', sc.category) AS course,
+       GROUP_CONCAT(DISTINCT si.image) AS bgi,
+       GROUP_CONCAT(DISTINCT st.name, '|', st.image) AS tourlist
+      FROM seoul_dobo AS sd
+             LEFT JOIN seoul_course sc on sd.idx = sc.seoul_dobo_idx
+             LEFT JOIN seoul_image si on sd.idx = sc.seoul_dobo_idx
+             LEFT JOIN seoul_tourlist st on sd.idx = st.seoul_dobo_idx
+      WHERE sd.idx = ?;
       `;
 
-    pool.query(sql, idx, (err, rows) => {
+    pool.query(sql, [idx], (err, rows) => {
       if (err) {
         reject(err);
       } else {
         resolve(rows);
       }
     })
-  });
+  })
 };
 
-exports.getReviewByDoboIdx = (doboIdx) => {
-  return new Promise((resolve, reject) => {
-    const sql =
-      `
-      SELECT cr.idx, cr.content, DATE_FORMAT(cr.created, '%Y.%m.%d') AS created, u.idx as uIdx, u.nick
-      FROM citizen_review cr
-      LEFT JOIN user u on cr.user_idx = u.idx
-      WHERE citizen_dobo_idx = ?;
-      `;
-
-    pool.query(sql, [doboIdx], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    })
-  });
-};
 
