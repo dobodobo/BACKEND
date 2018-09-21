@@ -4,7 +4,8 @@ const imageUtil = require('../ImageUtil');
 
 const authCtrl = require('../controllers/AuthCtrl');
 const userCtrl = require('../controllers/UserCtrl');
-const doboSTLECtrl = require('../controllers/DoboSLTECtrl');
+const doboSTLCtrl = require('../controllers/DoboSLTCtrl');
+const doboCtrl = require('../controllers/DoboCtrl');
 
 module.exports = (router) => {
 
@@ -46,6 +47,15 @@ module.exports = (router) => {
     .delete(authCtrl.auth, doboSTLCtrl.cancelReserve);
 
 
+  router.route('/seoul/:category')  //리스트
+    .get( doboCtrl.getList)
+
+  router.route('/seoul/:category/:dobo_idx')  //상세보기
+    .get(authCtrl.auth, doboCtrl.getDetail)
+
+  router.route('/seoul/:dobo_idx/review')   //리뷰
+  .post(authCtrl.auth, doboCtrl.addReview)
+  .delete(authCtrl.auth, doboCtrl.deleteReview);
 
   return router;
 };
