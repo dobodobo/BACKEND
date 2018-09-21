@@ -4,7 +4,8 @@ const imageUtil = require('../ImageUtil');
 
 const authCtrl = require('../controllers/AuthCtrl');
 const userCtrl = require('../controllers/UserCtrl');
-const doboSTLECtrl = require('../controllers/DoboSLTECtrl');
+const doboSTLCtrl = require('../controllers/DoboSLTCtrl');
+const doboCtrl = require('../controllers/DoboCtrl');
 
 module.exports = (router) => {
 
@@ -45,6 +46,11 @@ module.exports = (router) => {
     .post(authCtrl.auth, doboSTLCtrl.createReserve)
     .delete(authCtrl.auth, doboSTLCtrl.cancelReserve);
 
+
+
+  router.route('/seoul/:dobo_idx/review')   //리뷰
+    .post(authCtrl.auth, doboCtrl.addReview)
+    .delete(authCtrl.auth, doboCtrl.deleteReview);
 
 
   return router;
