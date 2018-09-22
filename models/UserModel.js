@@ -283,11 +283,11 @@ exports.reqSeoulight = (sData) => {
 
           const sql =
             `
-           INSERT INTO seoullight(name, birth, organization, portfolio, email, phone, intro, image, user_idx)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+           INSERT INTO seoullight(name, birth, organization, portfolio, phone, intro, image, user_idx)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?);
            `;
 
-          context.conn.query(sql, [sData.name, sData.birth, sData.organization, sData.portfolio, sData.email, sData.phone, sData.intro, sData.image, sData.user_idx], (err, rows) => {
+          context.conn.query(sql, [sData.name, sData.birth, sData.organization, sData.portfolio, sData.phone, sData.intro, sData.image, sData.user_idx], (err, rows) => {
             if (err) {
               reject(context);
             } else {

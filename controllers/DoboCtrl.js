@@ -78,7 +78,7 @@ exports.getList = async (req, res, next) => {
   writed by 경인
 */
 exports.getDetail = async (req, res, next) => {
-  let result = {};
+  let result= {};
   try {
     const reqData = {
       dobo_idx : req.params.dobo_idx,
