@@ -5,7 +5,7 @@ const config = require('../config/config');
 const pool = config.pool;
 
 const transactionWrapper = require('./TransactionWrapper');
-const {DOBO_STATUS, RESERVE_STATUS} = require('../Constant');
+const {DOBO_STATUS} = require('../Constant');
 
 
 exports.register = (data, extraData) => {
