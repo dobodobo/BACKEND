@@ -6,6 +6,8 @@ const config = require('../config/config');
 const pool = config.pool;
 const transactionWrapper = require('./TransactionWrapper');
 
+const {RESERVE_STATUS} = require('../Constant');
+
 
 exports.checkEmail = (email) => {
   return new Promise((resolve, reject) => {
