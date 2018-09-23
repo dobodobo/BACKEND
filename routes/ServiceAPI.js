@@ -34,7 +34,7 @@ module.exports = (router) => {
 
 
   // DOBO WITH SLT
-  router.route('/seoulite')
+  router.route('/seoulite/:category')
     .get(authCtrl.auth, doboSTLCtrl.getList)
     .post(authCtrl.auth, imageUtil.uploadFields, doboSTLCtrl.register);
 
