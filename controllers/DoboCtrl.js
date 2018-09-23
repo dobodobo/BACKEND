@@ -1,6 +1,6 @@
 'use strict';
 
-const { USER_ROLE } = require('../Constant');
+const {USER_ROLE} = require('../Constant');
 const doboModel = require('../models/DoboModel');
 
 
@@ -57,10 +57,12 @@ exports.deleteReview = async (req, res, next) => {
 exports.getList = async (req, res, next) => {
   let result;
   try {
+
     const reqData = {
       category: req.params.category
-    }
-    // console.log(reqData.category)
+    };
+
+
     if (!reqData.category) {
       return next(2401);  //카테고리 없으면 에러 
     }
@@ -80,10 +82,12 @@ exports.getList = async (req, res, next) => {
 exports.getDetail = async (req, res, next) => {
   let result;
   try {
+
     const reqData = {
-      dobo_idx : req.params.dobo_idx,
-      category : req.params.category          //쓰질않음 .. 경로 어떻게,,처리...
-    }
+      dobo_idx: req.params.dobo_idx,
+      category: req.params.category          //쓰질않음 .. 경로 어떻게,,처리...
+    };
+
     result = await doboModel.getDetail(reqData.dobo_idx);
 
   } catch (error) {

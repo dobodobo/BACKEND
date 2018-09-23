@@ -13,3 +13,8 @@ exports.RESERVE_STATUS = {
   RESERVE: 'RESERVE',
   CANCEL: 'CANCEL'
 };
+
+exports.SORT = {
+  COUNT: 'count',
+  DUE: 'due'
+};
