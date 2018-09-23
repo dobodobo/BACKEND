@@ -7,8 +7,6 @@ const doboSLTModel = require('../models/DoboSTLModel');
 
 // 시민해설사 관광 등록
 exports.register = async(req, res, next) => {
-
-
   try {
 
     const user = await userModel.getUserByIdx(req.userIdx);
@@ -16,20 +14,7 @@ exports.register = async(req, res, next) => {
       return next(9402);
     }
 
-    const tempCourse = [
-      {
-        category: 1,
-        name: 'a'
-      },
-      {
-        category: 2,
-        name: 'b'
-      },
-      {
-        category: 3,
-        name: 'c'
-      },
-    ];
+    const tempCourse = [{category: 1, name: 'a'}, {category: 2, name: 'b'}, {category: 3, name: 'c'},];
 
     const extraData = {
       bgi: [],
@@ -76,7 +61,6 @@ exports.getList = async(req, res, next) => {
 
   try {
 
-
     if (!req.query.sort) {
       result = await doboSLTModel.getListByCount();
     } else if (req.query.sort === 'due') {
@@ -89,7 +73,6 @@ exports.getList = async(req, res, next) => {
   } catch (error) {
     return next(error);
   }
-
 
   return res.r(result);
 };
