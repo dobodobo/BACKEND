@@ -111,7 +111,7 @@ exports.getSalt = (email) => {
       if (err) {
         reject(err);
       } else {
-        if (rows === 0) {
+        if (rows.length === 0) {
           reject(1402);
         } else {
           resolve(rows[0].salt);
