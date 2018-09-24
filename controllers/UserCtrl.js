@@ -170,6 +170,7 @@ exports.reqSeoulight = async (req, res, next) => {
       birth: req.body.birth,
       oranization: req.body.oranization,
       portfolio: req.body.portfolio,
+      email: req.body.email,
       phone: req.body.phone,
       intro: req.body.intro,
       user_idx: req.userIdx,
