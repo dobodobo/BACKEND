@@ -111,7 +111,7 @@ exports.getSalt = (email) => {
       if (err) {
         reject(err);
       } else {
-        if (rows === 0) {
+        if (rows.length === 0) {
           reject(1402);
         } else {
           resolve(rows[0].salt);
@@ -140,7 +140,8 @@ exports.signin = (user) => {
         } else {
           const profile = {
             idx: rows[0].idx,
-            email: rows[0].email
+            email: rows[0].email,
+            role: rows[0].role
           };
 
           const token = jwt.sign(profile, config.jwt.cert, { "expiresIn": "10h" });

@@ -1,14 +1,12 @@
 'use strict';
 
-const {DOBO_STATUS, USER_ROLE, RESERVE_STATUS} = require('../Constant');
+const {DOBO_STATUS, USER_ROLE, RESERVE_STATUS, SORT} = require('../Constant');
 const userModel = require('../models/UserModel');
 const doboSLTModel = require('../models/DoboSTLModel');
 
 
 // 시민해설사 관광 등록
 exports.register = async(req, res, next) => {
-
-
   try {
 
     const user = await userModel.getUserByIdx(req.userIdx);
@@ -16,20 +14,7 @@ exports.register = async(req, res, next) => {
       return next(9402);
     }
 
-    const tempCourse = [
-      {
-        category: 1,
-        name: 'a'
-      },
-      {
-        category: 2,
-        name: 'b'
-      },
-      {
-        category: 3,
-        name: 'c'
-      },
-    ];
+    const tempCourse = [{category: 1, name: 'a'}, {category: 2, name: 'b'}, {category: 3, name: 'c'},];
 
     const extraData = {
       bgi: [],
@@ -75,21 +60,20 @@ exports.getList = async(req, res, next) => {
   let result;
 
   try {
-
+    const category = req.params.category;
 
     if (!req.query.sort) {
-      result = await doboSLTModel.getListByCount();
-    } else if (req.query.sort === 'due') {
-      result = await doboSLTModel.getListByDue();
+      result = await doboSLTModel.getListByCount(category);
+    } else if (req.query.sort === SORT.DUE) {
+      result = await doboSLTModel.getListByDue(category);
     } else {
-      result = await doboSLTModel.getListByCount();
+      result = await doboSLTModel.getListByCount(category);
     }
 
 
   } catch (error) {
     return next(error);
   }
-
 
   return res.r(result);
 };
