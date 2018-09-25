@@ -54,7 +54,7 @@ module.exports = (router) => {
   router.route('/seoul/:category')  //리스트
     .get(authCtrl.auth, doboCtrl.getList);
 
-  router.route('/seoul/:category/:dobo_idx')  //상세보기
+  router.route('/seoul/:dobo_idx/detail')  //상세보기
     .get(authCtrl.auth, doboCtrl.getDetail);
 
   router.route('/seoul/:dobo_idx/review')   //리뷰
