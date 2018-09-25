@@ -62,6 +62,7 @@ exports.getList = async(req, res, next) => {
   try {
     const category = req.params.category;
 
+    // 7은 전체 
     if (parseInt(category) === 7) {
       if (!req.query.sort || req.query.sort === SORT.COUNT) {
         result = await doboSLTModel.getAllListByCount();
