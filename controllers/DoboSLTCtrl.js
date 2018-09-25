@@ -108,11 +108,11 @@ exports.getDetail = async(req, res, next) => {
 
     const doboIdx = req.params.dobo_idx;
 
-    const temp = await doboSLTModel.getDetail(doboIdx);
+    const item = await doboSLTModel.getDetail(doboIdx);
 
     const review = await doboSLTModel.getReviewByDoboIdx(doboIdx);
 
-    temp.map((item) => {
+    // temp.map((item) => {
       const {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status} = item;
       result.dobo = {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status};
 
@@ -134,7 +134,7 @@ exports.getDetail = async(req, res, next) => {
       // });
 
       result.review = review;
-    });
+    // });
 
   } catch (error) {
     return next(error);
