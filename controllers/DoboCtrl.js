@@ -80,18 +80,27 @@ exports.getList = async (req, res, next) => {
   writed by 경인
 */
 exports.getDetail = async (req, res, next) => {
-  // let result ={};
-  let result ;
+  let result ={};
   try {
-
+    let temp, review;
     const reqData = {
-      dobo_idx: req.params.dobo_idx,
+      dobo_idx: req.params.dobo_idx
     };
-
-    result = await doboModel.getDetail(reqData.dobo_idx);
-    let review = await doboModel.getReview(reqData.dobo_idx);
     
-    result[0].review = review;
+    temp = await doboModel.getDetail(reqData.dobo_idx);
+    temp.review = await doboModel.getReview(reqData.dobo_idx);
+    const {idx, title, intro, content, image, course, bgi } = temp[0];
+    result.dobo =  {idx, title, intro, content, image, course, bgi };
+    
+    result.review = temp.review;
+
+    // result.dobo.tourlist =tourlist;
+    result.dobo.tourlist = temp[0].tourlist.split(',')
+    result.dobo.tourlist.map((data, id) => {
+      const [name,image] = data.split('|');
+      result.dobo.tourlist[id] ={name,image};
+    });
+    // result.dobo.tourlist =temp.tourlist;
 
   } catch (error) {
     return next(error);
