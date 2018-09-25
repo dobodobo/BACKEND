@@ -50,7 +50,7 @@ exports.addReview = (data) => {
     };
   
 /*
-    서울관광 전체 리스트 
+    서울관광 카테고리별 리스트 
     writed by 경인
 */
 exports.getList = (category) => {
@@ -63,6 +63,27 @@ exports.getList = (category) => {
       `;
 
     pool.query(sql, [category], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  })
+};
+/*
+    서울관광 전체 리스트 
+    writed by 경인
+*/
+exports.getAllList = () => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      SELECT idx, title, intro, image
+      FROM seoul_dobo 
+      `;
+
+    pool.query(sql, [], (err, rows) => {
       if (err) {
         reject(err);
       } else {
@@ -87,11 +108,9 @@ exports.getDetail= (idx) => {
        sd.content,
        sd.image,
        GROUP_CONCAT(DISTINCT sc.name, '|', sc.category) AS course,
-       GROUP_CONCAT(DISTINCT si.image) AS bgi,
        GROUP_CONCAT(DISTINCT st.name, '|', st.image) AS tourlist
       FROM seoul_dobo AS sd
              LEFT JOIN seoul_course sc on sd.idx = sc.seoul_dobo_idx
-             LEFT JOIN seoul_image si on sd.idx = sc.seoul_dobo_idx
              LEFT JOIN seoul_tourlist st on sd.idx = st.seoul_dobo_idx
       WHERE sd.idx = ?;
       `;
