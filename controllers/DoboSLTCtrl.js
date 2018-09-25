@@ -120,7 +120,7 @@ exports.getDetail = async(req, res, next) => {
       result.dobo.seoulite = {seoulite_idx, user_idx, name, avatar, email, intro, birth};
 
       result.dobo.bgi = item.bgi.split(',');
-      result.dobo.tourlist = item.tourlist.split(',');
+      // result.dobo.tourlist = item.tourlist.split(',');
       result.dobo.course = item.course.split(',');
 
       result.dobo.course.map((data, id) => {
@@ -128,10 +128,10 @@ exports.getDetail = async(req, res, next) => {
         result.dobo.course[id] = {name, category};
       });
 
-      result.dobo.tourlist.map((data, id) => {
-        const [name, image] = data.split('|');
-        result.dobo.tourlist[id] = {name, image};
-      });
+      // result.dobo.tourlist.map((data, id) => {
+      //   const [name, image] = data.split('|');
+      //   result.dobo.tourlist[id] = {name, image};
+      // });
 
       result.review = review;
     });
