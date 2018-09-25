@@ -105,5 +105,23 @@ exports.getDetail= (idx) => {
     })
   })
 };
+exports.getReview= (idx) => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      SELECT sr.idx, sr.content, DATE_FORMAT(sr.created, '%Y.%m.%d') AS created, u.idx as uIdx, u.nick
+      FROM seoul_review sr
+      LEFT JOIN user u on sr.user_idx = u.idx
+      WHERE seoul_dobo_idx = ?;
+      `;
 
+    pool.query(sql, [idx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  })
+};
 

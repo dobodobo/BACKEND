@@ -80,20 +80,24 @@ exports.getList = async (req, res, next) => {
   writed by 경인
 */
 exports.getDetail = async (req, res, next) => {
-  let result;
+  // let result ={};
+  let result ;
   try {
 
     const reqData = {
       dobo_idx: req.params.dobo_idx,
-      // category: req.params.category          //쓰질않음 .. 경로 어떻게,,처리...
     };
 
     result = await doboModel.getDetail(reqData.dobo_idx);
+    let review = await doboModel.getReview(reqData.dobo_idx);
+    
+    result[0].review = review;
 
   } catch (error) {
     return next(error);
   }
-
+  // console.log(result +"aaaaaaaaaaa")
+  // console.log(review)
   return res.r(result);
 };
 

@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 const pool = config.pool;
 const transactionWrapper = require('./TransactionWrapper');
+const { RESERVE_STATUS } = require('../Constant');
 
-const {RESERVE_STATUS} = require('../Constant');
 
 
 exports.checkEmail = (email) => {
@@ -286,12 +286,12 @@ exports.reqSeoulight = (sData) => {
 
           const sql =
             `
-           INSERT INTO seoullight(name, birth, organization, portfolio, email, phone, intro, image, user_idx)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-           `;
-
-          context.conn.query(sql, [sData.name, sData.birth, sData.organization, sData.portfolio, sData.email, sData.phone, sData.intro, sData.image, sData.user_idx], (err, rows) => {
-            if (err) {
+            INSERT INTO seoullight(name, birth, organization, portfolio, email, phone, intro, image, user_idx)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            `;
+ 
+           context.conn.query(sql, [sData.name, sData.birth, sData.organization, sData.portfolio, sData.email, sData.phone, sData.intro, sData.image, sData.user_idx], (err, rows) => {
+             if (err) {
               reject(context);
             } else {
               resolve(context);
