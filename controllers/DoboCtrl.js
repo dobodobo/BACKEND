@@ -66,7 +66,8 @@ exports.getList = async (req, res, next) => {
     if (!reqData.category) {
       return next(2401);  //카테고리 없으면 에러 
     }
-    if(reqData.category == Number(7))
+
+    if(parseInt(reqData.category) === 7)
         result = await doboModel.getAllList();
     else
         result = await doboModel.getList(reqData.category);
