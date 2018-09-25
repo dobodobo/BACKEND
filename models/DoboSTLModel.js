@@ -282,7 +282,8 @@ exports.getReviewByDoboIdx = (doboIdx) => {
       SELECT cr.idx, cr.content, DATE_FORMAT(cr.created, '%Y.%m.%d') AS created, u.idx as uIdx, u.nick
       FROM citizen_review cr
       LEFT JOIN user u on cr.user_idx = u.idx
-      WHERE citizen_dobo_idx = ?;
+      WHERE citizen_dobo_idx = ?
+      ORDER BY cr.idx DESC;
       `;
 
     pool.query(sql, [doboIdx], (err, rows) => {
