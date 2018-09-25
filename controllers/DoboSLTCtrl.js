@@ -62,12 +62,18 @@ exports.getList = async(req, res, next) => {
   try {
     const category = req.params.category;
 
-    if (!req.query.sort) {
-      result = await doboSLTModel.getListByCount(category);
-    } else if (req.query.sort === SORT.DUE) {
-      result = await doboSLTModel.getListByDue(category);
+    if (parseInt(category) === 7) {
+      if (!req.query.sort || req.query.sort === SORT.COUNT) {
+        result = await doboSLTModel.getAllListByCount();
+      } else if (req.query.sort === SORT.DUE) {
+        result = await doboSLTModel.getAllListByDue();
+      }
     } else {
-      result = await doboSLTModel.getListByCount(category);
+      if (!req.query.sort || req.query.sort === SORT.COUNT) {
+        result = await doboSLTModel.getListByCount(category);
+      } else if (req.query.sort === SORT.DUE) {
+        result = await doboSLTModel.getListByDue(category);
+      }
     }
 
 
