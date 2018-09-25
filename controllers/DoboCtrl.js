@@ -85,7 +85,7 @@ exports.getDetail = async (req, res, next) => {
 
     const reqData = {
       dobo_idx: req.params.dobo_idx,
-      category: req.params.category          //쓰질않음 .. 경로 어떻게,,처리...
+      // category: req.params.category          //쓰질않음 .. 경로 어떻게,,처리...
     };
 
     result = await doboModel.getDetail(reqData.dobo_idx);
