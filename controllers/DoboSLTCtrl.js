@@ -108,13 +108,13 @@ exports.getDetail = async(req, res, next) => {
 
     const doboIdx = req.params.dobo_idx;
 
-    const item = await doboSLTModel.getDetail(doboIdx);
+    const item = await doboSLTModel.getDetail(doboIdx, req.userIdx);
 
     const review = await doboSLTModel.getReviewByDoboIdx(doboIdx);
 
     // temp.map((item) => {
-      const {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status} = item;
-      result.dobo = {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status};
+      const {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status, isReserved} = item;
+      result.dobo = {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status, isReserved};
 
       const {seoulite_idx, user_idx, name, avatar, email, intro, birth, organization} = item;
       result.dobo.seoulite = {seoulite_idx, user_idx, name, avatar, email, intro, birth, organization};

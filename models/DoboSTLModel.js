@@ -230,7 +230,7 @@ exports.createReview = (data) => {
 
 
 
-exports.getDetail = (idx) => {
+exports.getDetail = (doboIdx, userIdx) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
@@ -255,7 +255,8 @@ exports.getDetail = (idx) => {
        DATE_FORMAT(s.birth, '%Y.%m.%d'),
        s.intro,
        s.email,
-       s.organization
+       s.organization,
+       (SELECT IF(COUNT(cr.user_idx) > 0, TRUE , FALSE ) FROM citizen_reserve cr WHERE cr.user_idx=? AND cr.status='RESERVE' AND cr.citizen_dobo_idx=?) as isReserved
       FROM citizen_dobo AS cd
              LEFT JOIN citizen_course cc on cd.idx = cc.citizen_dobo_idx
              LEFT JOIN citizen_image ci on cd.idx = ci.citizen_dobo_idx
@@ -264,10 +265,11 @@ exports.getDetail = (idx) => {
       WHERE cd.idx = ?;
       `;
 
-    pool.query(sql, idx, (err, rows) => {
+    pool.query(sql, [userIdx, doboIdx, doboIdx], (err, rows) => {
       if (err) {
         reject(err);
       } else {
+        rows[0].isReserved === 1 ? rows[0].isReserved = true : rows[0].isReserved = false;
         resolve(rows[0]);
       }
     })
