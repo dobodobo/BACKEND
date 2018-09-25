@@ -89,13 +89,19 @@ exports.getDetail = async (req, res, next) => {
     
     temp = await doboModel.getDetail(reqData.dobo_idx);
     temp.review = await doboModel.getReview(reqData.dobo_idx);
-    const {idx, title, intro, content, image, course, bgi } = temp[0];
+    const {idx, title, intro, content, image, course, bgi } = temp;
     result.dobo =  {idx, title, intro, content, image, course, bgi };
     
     result.review = temp.review;
 
     // result.dobo.tourlist =tourlist;
-    result.dobo.tourlist = temp[0].tourlist.split(',')
+    result.dobo.course = temp.course.split(',');
+    result.dobo.tourlist = temp.tourlist.split(',');
+
+    result.dobo.course.map((data, id) => {
+      const [name,category] = data.split('|');
+      result.dobo.course[id] ={name,category};
+    });
     result.dobo.tourlist.map((data, id) => {
       const [name,image] = data.split('|');
       result.dobo.tourlist[id] ={name,image};

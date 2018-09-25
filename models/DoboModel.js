@@ -100,7 +100,7 @@ exports.getDetail= (idx) => {
       if (err) {
         reject(err);
       } else {
-        resolve(rows);
+        resolve(rows[0]);
       }
     })
   })
