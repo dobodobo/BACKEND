@@ -38,7 +38,7 @@ module.exports = (router) => {
     .get(authCtrl.auth, doboSTLCtrl.getList)
     .post(authCtrl.auth, imageUtil.uploadFields, doboSTLCtrl.register);
 
-  router.route('/seoulite/:dobo_idx')
+  router.route('/seoulite/:dobo_idx/detail')
     .get(authCtrl.auth, doboSTLCtrl.getDetail);
 
   router.route('/seoulite/:dobo_idx/review')
@@ -54,7 +54,7 @@ module.exports = (router) => {
   router.route('/seoul/:category')  //리스트
     .get(authCtrl.auth, doboCtrl.getList);
 
-  router.route('/seoul/:category/:dobo_idx')  //상세보기
+  router.route('/seoul/:dobo_idx/detail')  //상세보기
     .get(authCtrl.auth, doboCtrl.getDetail);
 
   router.route('/seoul/:dobo_idx/review')   //리뷰
