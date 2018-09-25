@@ -248,7 +248,6 @@ exports.getDetail = (idx) => {
        cd.status,
        GROUP_CONCAT(DISTINCT cc.name, '|', cc.category) AS course,
        GROUP_CONCAT(DISTINCT ci.image) AS bgi,
-       GROUP_CONCAT(DISTINCT ct.name, '|', ct.image) AS tourlist,
        s.idx AS seoulite_idx,
        s.name,
        u.idx AS user_idx,
@@ -259,7 +258,6 @@ exports.getDetail = (idx) => {
       FROM citizen_dobo AS cd
              LEFT JOIN citizen_course cc on cd.idx = cc.citizen_dobo_idx
              LEFT JOIN citizen_image ci on cd.idx = ci.citizen_dobo_idx
-             LEFT JOIN citizen_tourlist ct on cd.idx = ct.citizen_dobo_idx
              LEFT JOIN seoullight s ON cd.seoullight_idx = s.idx
              LEFT JOIN user u on s.user_idx = u.idx
       WHERE cd.idx = ?;
