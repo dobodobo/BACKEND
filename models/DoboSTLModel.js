@@ -254,7 +254,8 @@ exports.getDetail = (idx) => {
        u.avatar,
        DATE_FORMAT(s.birth, '%Y.%m.%d'),
        s.intro,
-       s.email
+       s.email,
+       s.organization
       FROM citizen_dobo AS cd
              LEFT JOIN citizen_course cc on cd.idx = cc.citizen_dobo_idx
              LEFT JOIN citizen_image ci on cd.idx = ci.citizen_dobo_idx
