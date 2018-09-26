@@ -67,37 +67,6 @@ exports.register = (data, extraData) => {
       .then(context => {
         return new Promise((resolve, reject) => {
 
-          let tourArr = [];
-          for (let i = 0; i < extraData.tour.length; i++) {
-            tourArr[i] = [insertedIdx];
-            tourArr[i].push(...extraData.tour[i]);
-          }
-
-          const sql =
-            `
-            INSERT INTO citizen_tourlist(citizen_dobo_idx, image, name)
-            VALUES ?;
-            `;
-
-          context.conn.query(sql, [tourArr], (err, rows) => {
-            if (err) {
-              context.error = err;
-              reject(context);
-            } else {
-              if (rows.affectedRows === extraData.tour.length) {
-                context.result = rows;
-                resolve(context)
-              } else {
-                context.error = new Error("CUSTOM ERROR IN INSERT TOURLIST IMAGE")
-                reject(context);
-              }
-            }
-          })
-        })
-      })
-      .then(context => {
-        return new Promise((resolve, reject) => {
-
           let courseArr = [];
           for (let i = 0; i < extraData.course.length; i++) {
             courseArr[i] = [insertedIdx];
