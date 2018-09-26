@@ -21,7 +21,7 @@ exports.register = async(req, res, next) => {
       bgi: [],
       course: []
     };
-    
+
     if (req.files.bgi.length > 1 && req.body.course.length > 1) {
       req.files.bgi.map(file => extraData.bgi.push(file.location));
       req.body.course.map(item => extraData.course.push(item.category, item.name))
