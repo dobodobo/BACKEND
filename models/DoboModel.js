@@ -107,6 +107,7 @@ exports.getDetail= (idx) => {
        sd.intro,
        sd.content,
        sd.image,
+       sd.category,
        sd.cos_code,
        GROUP_CONCAT(DISTINCT sc.name, '|', sc.category) AS course,
        GROUP_CONCAT(DISTINCT st.name, '|', st.image) AS tourlist
