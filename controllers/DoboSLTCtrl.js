@@ -62,12 +62,19 @@ exports.getList = async(req, res, next) => {
   try {
     const category = req.params.category;
 
-    if (!req.query.sort) {
-      result = await doboSLTModel.getListByCount(category);
-    } else if (req.query.sort === SORT.DUE) {
-      result = await doboSLTModel.getListByDue(category);
+    // 7은 전체 
+    if (parseInt(category) === 7) {
+      if (!req.query.sort || req.query.sort === SORT.COUNT) {
+        result = await doboSLTModel.getAllListByCount();
+      } else if (req.query.sort === SORT.DUE) {
+        result = await doboSLTModel.getAllListByDue();
+      }
     } else {
-      result = await doboSLTModel.getListByCount(category);
+      if (!req.query.sort || req.query.sort === SORT.COUNT) {
+        result = await doboSLTModel.getListByCount(category);
+      } else if (req.query.sort === SORT.DUE) {
+        result = await doboSLTModel.getListByDue(category);
+      }
     }
 
 
@@ -108,19 +115,19 @@ exports.getDetail = async(req, res, next) => {
 
     const doboIdx = req.params.dobo_idx;
 
-    const item = await doboSLTModel.getDetail(doboIdx);
+    const item = await doboSLTModel.getDetail(doboIdx, req.userIdx);
 
     const review = await doboSLTModel.getReviewByDoboIdx(doboIdx);
 
     // temp.map((item) => {
-      const {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status} = item;
-      result.dobo = {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status};
+      const {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status, isReserved} = item;
+      result.dobo = {idx, title, content, min_people, max_people, category, lang, start_date, end_date, due_date, status, isReserved};
 
-      const {seoulite_idx, user_idx, name, avatar, email, intro, birth} = item;
-      result.dobo.seoulite = {seoulite_idx, user_idx, name, avatar, email, intro, birth};
+      const {seoulite_idx, user_idx, name, avatar, email, intro, birth, organization} = item;
+      result.dobo.seoulite = {seoulite_idx, user_idx, name, avatar, email, intro, birth, organization};
 
       result.dobo.bgi = item.bgi.split(',');
-      result.dobo.tourlist = item.tourlist.split(',');
+      // result.dobo.tourlist = item.tourlist.split(',');
       result.dobo.course = item.course.split(',');
 
       result.dobo.course.map((data, id) => {
@@ -128,10 +135,10 @@ exports.getDetail = async(req, res, next) => {
         result.dobo.course[id] = {name, category};
       });
 
-      result.dobo.tourlist.map((data, id) => {
-        const [name, image] = data.split('|');
-        result.dobo.tourlist[id] = {name, image};
-      });
+      // result.dobo.tourlist.map((data, id) => {
+      //   const [name, image] = data.split('|');
+      //   result.dobo.tourlist[id] = {name, image};
+      // });
 
       result.review = review;
     // });

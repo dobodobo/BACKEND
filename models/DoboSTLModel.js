@@ -211,6 +211,70 @@ exports.getListByDue = (category) => {
 };
 
 
+exports.getAllListByDue = () => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      SELECT 
+        cd.idx,
+        cd.min_people,
+        cd.max_people,
+        cd.title,
+        cd.content,
+        cd.category,
+        DATE_FORMAT(cd.due_date, '%Y.%m.%d') AS due_date,
+        cd.status,
+        cd.image,
+        cd.lang,
+        COUNT(cr.citizen_dobo_idx) AS count
+      FROM citizen_dobo AS cd
+             LEFT JOIN citizen_review cr on cd.idx = cr.citizen_dobo_idx       
+      GROUP BY cd.idx
+      ORDER BY cd.due_date DESC, cd.idx DESC ;
+      `;
+    pool.query(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  })
+};
+
+
+exports.getAllListByCount = () => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `
+      SELECT 
+        cd.idx,
+        cd.min_people,
+        cd.max_people,
+        cd.title,
+        cd.content,
+        cd.category,
+        DATE_FORMAT(cd.due_date, '%Y.%m.%d') AS due_date,
+        cd.status,
+        cd.image,
+        cd.lang,
+        COUNT(cr.citizen_dobo_idx) AS count
+      FROM citizen_dobo AS cd
+             LEFT JOIN citizen_review cr on cd.idx = cr.citizen_dobo_idx
+      GROUP BY cd.idx
+      ORDER BY count DESC, cd.idx DESC ;
+      `;
+    pool.query(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  })
+};
+
+
 
 exports.createReview = (data) => {
   return new Promise((resolve, reject) => {
@@ -230,7 +294,7 @@ exports.createReview = (data) => {
 
 
 
-exports.getDetail = (idx) => {
+exports.getDetail = (doboIdx, userIdx) => {
   return new Promise((resolve, reject) => {
     const sql =
       `
@@ -248,27 +312,28 @@ exports.getDetail = (idx) => {
        cd.status,
        GROUP_CONCAT(DISTINCT cc.name, '|', cc.category) AS course,
        GROUP_CONCAT(DISTINCT ci.image) AS bgi,
-       GROUP_CONCAT(DISTINCT ct.name, '|', ct.image) AS tourlist,
        s.idx AS seoulite_idx,
        s.name,
        u.idx AS user_idx,
        u.avatar,
        DATE_FORMAT(s.birth, '%Y.%m.%d'),
        s.intro,
-       s.email
+       s.email,
+       s.organization,
+       (SELECT IF(COUNT(cr.user_idx) > 0, TRUE , FALSE ) FROM citizen_reserve cr WHERE cr.user_idx=? AND cr.status='RESERVE' AND cr.citizen_dobo_idx=?) as isReserved
       FROM citizen_dobo AS cd
              LEFT JOIN citizen_course cc on cd.idx = cc.citizen_dobo_idx
              LEFT JOIN citizen_image ci on cd.idx = ci.citizen_dobo_idx
-             LEFT JOIN citizen_tourlist ct on cd.idx = ct.citizen_dobo_idx
              LEFT JOIN seoullight s ON cd.seoullight_idx = s.idx
              LEFT JOIN user u on s.user_idx = u.idx
       WHERE cd.idx = ?;
       `;
 
-    pool.query(sql, idx, (err, rows) => {
+    pool.query(sql, [userIdx, doboIdx, doboIdx], (err, rows) => {
       if (err) {
         reject(err);
       } else {
+        rows[0].isReserved === 1 ? rows[0].isReserved = true : rows[0].isReserved = false;
         resolve(rows[0]);
       }
     })
@@ -282,7 +347,8 @@ exports.getReviewByDoboIdx = (doboIdx) => {
       SELECT cr.idx, cr.content, DATE_FORMAT(cr.created, '%Y.%m.%d') AS created, u.idx as uIdx, u.nick
       FROM citizen_review cr
       LEFT JOIN user u on cr.user_idx = u.idx
-      WHERE citizen_dobo_idx = ?;
+      WHERE citizen_dobo_idx = ?
+      ORDER BY cr.idx DESC;
       `;
 
     pool.query(sql, [doboIdx], (err, rows) => {

@@ -132,7 +132,8 @@ exports.getReview= (idx) => {
       SELECT sr.idx, sr.content, DATE_FORMAT(sr.created, '%Y.%m.%d') AS created, u.idx as uIdx, u.nick
       FROM seoul_review sr
       LEFT JOIN user u on sr.user_idx = u.idx
-      WHERE seoul_dobo_idx = ?;
+      WHERE seoul_dobo_idx = ?
+      ORDER BY sr.idx DESC;
       `;
 
     pool.query(sql, [idx], (err, rows) => {
