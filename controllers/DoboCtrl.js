@@ -92,9 +92,9 @@ exports.getDetail = async (req, res, next) => {
     
     temp = await doboModel.getDetail(reqData.dobo_idx);
     temp.review = await doboModel.getReview(reqData.dobo_idx);
-    const {idx, title, intro, content, image, course, bgi } = temp;
-    result.dobo =  {idx, title, intro, content, image, course, bgi };
-    
+    const {idx, title, intro, content, image, cos_code } = temp;
+    result.dobo =  {idx, title, intro, content, image };
+    result.dobo.cos_url = 'http://dobo.visitseoul.net/web/_kr/webReservation/new_request_step1.do?cos_code=' + cos_code ;
     result.review = temp.review;
 
     // result.dobo.tourlist =tourlist;
