@@ -15,16 +15,18 @@ exports.register = async(req, res, next) => {
     }
 
 
-    // const tempCourse = [{category: 1, name: 'a'}, {category: 2, name: 'b'}, {category: 3, name: 'c'},];
+    // const tempCourse = "[{category: 1, name: 'a'}, {category: 2, name: 'b'}, {category: 3, name: 'c'}]";
+    let course = JSON.stringify(req.body.course);
+    course = JSON.parse(course);
 
     const extraData = {
       bgi: [],
       course: []
     };
 
-    if (req.files.length > 1 && req.body.course.length > 1) {
+    if (req.files.length > 1 && course.length > 1) {
       req.files.map(file => extraData.bgi.push(file.location));
-      req.body.course.map(item => extraData.course.push(item.category, item.name))
+      course.map(item => extraData.course.push(item.category, item.name))
     } else return next(2402);
 
 
