@@ -15,9 +15,9 @@ module.exports = (router) => {
 
   router.route('/users/signin')
     .post(userCtrl.signin);
-   
+
   router.route('/users/pwd') //정보 수정
-    .put(authCtrl.auth,userCtrl.editPwd);
+    .put(authCtrl.auth, userCtrl.editPwd);
 
   router.route('/users/avatar') //사진 수정
     .put(authCtrl.auth, imageUtil.uploadSingle, userCtrl.editAvatar);
@@ -26,17 +26,19 @@ module.exports = (router) => {
     .post(authCtrl.auth, userCtrl.reqSeoulight);
 
   router.route('/users/feedback') //건의사항 
-    .post(authCtrl.auth,userCtrl.addFeedback);
+    .post(authCtrl.auth, userCtrl.addFeedback);
 
   router.route('/users/mypage') //마이페이지
-    .get(authCtrl.auth,userCtrl.getMypage);
-
+    .get(authCtrl.auth, userCtrl.getMypage);
 
 
   // DOBO WITH SLT
-  router.route('/seoulite/:category')
-    .get(authCtrl.auth, doboSTLCtrl.getList)
+
+  router.route('/seolulite')
     .post(authCtrl.auth, imageUtil.uploadFields, doboSTLCtrl.register);
+
+  router.route('/seoulite/:category')
+    .get(authCtrl.auth, doboSTLCtrl.getList);
 
   router.route('/seoulite/:dobo_idx/detail')
     .get(authCtrl.auth, doboSTLCtrl.getDetail);
@@ -49,7 +51,6 @@ module.exports = (router) => {
     .delete(authCtrl.auth, doboSTLCtrl.cancelReserve);
 
 
-
   // DOBO WITH SEOUL
   router.route('/seoul/:category')  //리스트
     .get(authCtrl.auth, doboCtrl.getList);
@@ -58,8 +59,8 @@ module.exports = (router) => {
     .get(authCtrl.auth, doboCtrl.getDetail);
 
   router.route('/seoul/:dobo_idx/review')   //리뷰
-  .post(authCtrl.auth, doboCtrl.addReview)
-  .delete(authCtrl.auth, doboCtrl.deleteReview);
+    .post(authCtrl.auth, doboCtrl.addReview)
+    .delete(authCtrl.auth, doboCtrl.deleteReview);
 
   return router;
 };
