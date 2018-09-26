@@ -72,9 +72,10 @@ exports.register = (data, extraData) => {
             courseArr[i] = [insertedIdx];
             courseArr[i].push(...extraData.course[i]);
           }
+
           const sql =
             `
-            INSERT INTO citizen_course(citizen_dobo_idx, category, name)
+            INSERT INTO citizen_course(citizen_dobo_idx, temp, category, name)
             VALUES ?;
             `;
           context.conn.query(sql, [courseArr], (err, rows) => {
