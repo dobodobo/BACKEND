@@ -95,8 +95,8 @@ exports.getDetail = async (req, res, next) => {
     temp.review = await doboModel.getReview(reqData.dobo_idx);
     const {idx, title, intro, content, image, category, cos_code } = temp;
     result.dobo =  {idx, title, intro, content, image };
-    if(category === 5){
-      result.dobo.cos_url = 'walkingtours@sto.or.kr';
+    if(parseInt(category) === 5){
+      result.dobo.cos_url = 'http://korean.visitseoul.net/walking-tour/%EC%8B%9C%EC%B2%AD%EA%B0%81-%EC%9E%A5%EC%95%A0%EC%9D%B8_/18262?curPage=3';
     }
     else{
     result.dobo.cos_url = 'http://dobo.visitseoul.net/web/_kr/webReservation/new_request_step1.do?cos_code=' + cos_code ;
