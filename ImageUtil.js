@@ -12,7 +12,7 @@ const s3 = new aws.S3();
 
 const storageS3 = multerS3({
   s3: s3,
-  bucket: 'dobo/images',
+  bucket: 's3-kyeahen/images',
   acl: 'public-read',
   key: function (req, file, callback) {
     const fname = Date.now() + '_' + file.originalname;
