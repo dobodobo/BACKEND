@@ -168,7 +168,7 @@ exports.reqSeoulight = async (req, res, next) => {
     const data = {
       name: req.body.name,
       birth: req.body.birth,
-      oranization: req.body.oranization,
+      organization: req.body.organization,
       portfolio: req.body.portfolio,
       email: req.body.email,
       phone: req.body.phone,
